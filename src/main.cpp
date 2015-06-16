@@ -1,4 +1,7 @@
+#include <iostream>
+using namespace std;
 int launchFiber(){
+	cout << "Hello Fiber!"<<endl;
 	return 0;
 }
 int main(){
