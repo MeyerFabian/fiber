@@ -31,9 +31,11 @@
 #include "vtkVolumeProperty.h"
 #include "vtkXMLImageDataReader.h"
 #include "vtkSmartVolumeMapper.h"
+#include "vtkNIFTIImageReader.h"
 
 #define VTI_FILETYPE 1
 #define MHA_FILETYPE 2
+#define NIFTI_FILETYPE 3
 
 // Callback for moving the planes from the box widget to the mapper
 class vtkBoxWidgetCallback : public vtkCommand
@@ -146,6 +148,13 @@ int main(int argc, char *argv[])
       sprintf( fileName, "%s", argv[count+1] );
       count += 2;
       }
+      else if ( !strcmp( argv[count], "-NIFTI" ) )
+        {
+        fileName = new char[strlen(argv[count+1])+1];
+        fileType = NIFTI_FILETYPE;
+        sprintf( fileName, "%s", argv[count+1] );
+        count += 2;
+        }
     else if ( !strcmp( argv[count], "-MHA" ) )
       {
       fileName = new char[strlen(argv[count+1])+1];
@@ -269,6 +278,13 @@ int main(int argc, char *argv[])
     dicomReader->Update();
     input=dicomReader->GetOutput();
     reader=dicomReader;
+    }
+    else if ( fileType == NIFTI_FILETYPE ){
+      vtkNIFTIImageReader *niftreader = vtkNIFTIImageReader::New();
+      niftreader->SetFileName(fileName);
+      niftreader->Update();
+      input=niftreader->GetOutput();
+      reader=niftreader;
     }
   else if ( fileType == VTI_FILETYPE )
     {
