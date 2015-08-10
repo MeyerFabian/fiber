@@ -1,13 +1,23 @@
 # fiber
 Repository for the fiber tracking project.
 
-REQUIRED PACKAGES:
+REQUIRED:
 VTK (6.2.0) http://www.vtk.org/download/
+C++11/14 Compiler Support (Mingw, Mingw64, MSVC)
+Windows (tested only on Windows)
+OpenGL (at least 2.1)
+
+INSTALLATION:
+
+1. Download and install VTK from http://www.vtk.org/download/ using CMake and your compiler of choice. 
+	- If you run into errors linking with Microsoft Devolpment Kit uncheck the DirectX directory in CMake.
+	- If you use Mingw(64) Compiler you may run into some errors because the conventions are more strict to the C++ Standard. Just correct these lines directly in the code.
+2. Clone this repository and build it using cmake and your compiler of choice and link it with VTK.
+3. Copy the dynamic linked libraries from the vtk-bin into the bin folder of the fiber-tracking project.
+4. Download or use your own (converted) NIFTI-Images and put them somewhere in the bin folder, where you will find them (e.g. bin/datasets/dti30/dti30.nii)
+5. Run fiber.exe from command line with the dataset: "fiber -NII datasets/dti30/dti30.nii"
+
 
 INPUT DATA:
 
-.nii (NIFTI-Images work)
-
-.dicom (DICOM-Images are widely compressed and there is just very little resources to work with that can be read)
-
-DTI-MR data format we will be supplied with: - - yet still unclear
+.nii (NIFTI-Images), NIFTI is an extension of the DICOM-format to support DTI-Imaging.
