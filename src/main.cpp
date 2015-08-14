@@ -33,12 +33,15 @@
 #include "vtkSmartVolumeMapper.h"
 #include "vtkNIFTIImageReader.h"
 #include "vtkSmartPointer.h"
+#include "vtkImagePlaneWidget.h"
+#include "vtkInteractorStyleUser.h"
 
 #define VTI_FILETYPE 1
 #define MHA_FILETYPE 2
 #define NIFTI_FILETYPE 3
 
 // Callback for moving the planes from the box widget to the mapper
+
 class vtkBoxWidgetCallback : public vtkCommand
 {
 public:
@@ -127,6 +130,7 @@ int main(int argc, char *argv[])
   double frameRate = 10.0;
   char *fileName=0;
   int fileType=0;
+  int imageplane=0;
 
   bool independentComponents=true;
 
@@ -169,6 +173,11 @@ int main(int argc, char *argv[])
       clip = 1;
       count++;
       }
+      else if ( !strcmp( argv[count], "-Imageplane") )
+        {
+      imageplane = 1;
+        count++;
+        }
     else if ( !strcmp( argv[count], "-MIP" ) )
       {
       opacityWindow = atof( argv[count+1] );
@@ -267,7 +276,6 @@ int main(int argc, char *argv[])
   vtkSmartPointer<vtkRenderWindowInteractor> iren = vtkSmartPointer<vtkRenderWindowInteractor>::New();
   iren->SetRenderWindow(renWin);
   iren->SetDesiredUpdateRate(frameRate / (1+clip) );
-
   iren->GetInteractorStyle()->SetDefaultRenderer(renderer);
 
   // Read the data
@@ -335,7 +343,8 @@ int main(int argc, char *argv[])
   vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
 
   // Add a box widget if the clip option was selected
-  vtkSmartPointer<vtkBoxWidget> box = vtkSmartPointer<vtkBoxWidget>::New();
+ vtkSmartPointer<vtkBoxWidget> box = vtkSmartPointer<vtkBoxWidget>::New();
+
   if (clip)
     {
     box->SetInteractor(iren);
@@ -358,6 +367,24 @@ int main(int argc, char *argv[])
     callback->Delete();
     box->EnabledOn();
     box->GetSelectedFaceProperty()->SetOpacity(0.0);
+    }
+
+  vtkSmartPointer<vtkImagePlaneWidget> iplane = vtkSmartPointer<vtkImagePlaneWidget>::New();
+  vtkSmartPointer<vtkProperty> ipwProp = vtkSmartPointer<vtkProperty>::New();
+  iplane->SetInteractor(iren);
+  iplane->SetInputConnection(reader->GetOutputPort());
+    if(imageplane)
+    {
+
+      iplane->RestrictPlaneToVolumeOn();
+      double color[3] = {0,1,0};
+      iplane->GetPlaneProperty()->SetColor(color);
+      //double origin[3] ={0,1,0};
+      iplane->SetPlaneOrientation(1);
+
+      iplane->SetDefaultRenderer(renderer);
+    //  iplane->UpdatePlacement();
+
     }
 
   if ( reductionFactor < 1.0 )
@@ -535,7 +562,7 @@ int main(int argc, char *argv[])
     }
 
   // Set the default window size
-  renWin->SetSize(600,600);
+  renWin->SetSize(1000,1000);
   renWin->Render();
 
   // Add the volume to the scene
@@ -545,6 +572,8 @@ int main(int argc, char *argv[])
 
   // interact with data
   renWin->Render();
+
+   iplane->On();
 
   iren->Start();
 

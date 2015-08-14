@@ -21,3 +21,11 @@ INSTALLATION:
 INPUT DATA:
 
 .nii (NIFTI-Images), NIFTI is an extension of the DICOM-format to support DTI-Imaging.
+
+
+Links for development:
+
+Will probably feature QT for GUI, examples can be found here: http://www.vtk.org/Wiki/VTK/Examples/Cxx#Qt
+
+3 Plane Slicing example, as its done in a lot of fiber tracking examples to have some anatomy reference in addition to the fibers:
+http://www.vtk.org/gitweb?p=VTK.git;a=blob;f=Examples/GUI/Qt/FourPaneViewer/QtVTKRenderWindows.cxx;h=3e94b312d5a5d9b3bfaacdc1f0142df09086326c;hb=HEAD
