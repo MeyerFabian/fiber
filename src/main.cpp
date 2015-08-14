@@ -32,6 +32,7 @@
 #include "vtkXMLImageDataReader.h"
 #include "vtkSmartVolumeMapper.h"
 #include "vtkNIFTIImageReader.h"
+#include "vtkSmartPointer.h"
 
 #define VTI_FILETYPE 1
 #define MHA_FILETYPE 2
@@ -43,25 +44,24 @@ class vtkBoxWidgetCallback : public vtkCommand
 public:
   static vtkBoxWidgetCallback *New()
     { return new vtkBoxWidgetCallback; }
-  virtual void Execute(vtkObject *caller, unsigned long, void*)
+  virtual void Execute(vtkObject* caller, unsigned long, void*)
     {
-      vtkBoxWidget *widget = reinterpret_cast<vtkBoxWidget*>(caller);
+      vtkSmartPointer<vtkBoxWidget> widget = reinterpret_cast<vtkBoxWidget * >(caller);
       if (this->Mapper)
         {
-        vtkPlanes *planes = vtkPlanes::New();
+        vtkSmartPointer<vtkPlanes> planes = vtkSmartPointer<vtkPlanes>::New();
         widget->GetPlanes(planes);
         this->Mapper->SetClippingPlanes(planes);
-        planes->Delete();
         }
     }
-  void SetMapper(vtkSmartVolumeMapper* m)
+  void SetMapper(vtkSmartPointer<vtkSmartVolumeMapper> m)
     { this->Mapper = m; }
 
 protected:
   vtkBoxWidgetCallback()
     { this->Mapper = 0; }
 
-  vtkSmartVolumeMapper *Mapper;
+  vtkSmartPointer<vtkSmartVolumeMapper> Mapper;
 };
 
 void PrintUsage()
@@ -107,8 +107,10 @@ void PrintUsage()
   cout << "and CT_Muscle are appropriate for DICOM data. MIP, CompositeRamp," << endl;
   cout << "and RGB_Composite are appropriate for RGB data." << endl;
   cout << endl;
-  cout << "Example: GPURenderDemo -DICOM CTNeck -MIP 4096 1024" << endl;
+  cout << "Example: fiber -NIFTI datasets/tensors.nii.gz -MIP 4096 1024" << endl;
   cout << endl;
+  int i = 0;
+  cin >> i;
 }
 
 int main(int argc, char *argv[])
@@ -253,8 +255,8 @@ int main(int argc, char *argv[])
     }
 
   // Create the renderer, render window and interactor
-  vtkRenderer *renderer = vtkRenderer::New();
-  vtkRenderWindow *renWin = vtkRenderWindow::New();
+  vtkSmartPointer<vtkRenderer> renderer = vtkSmartPointer<vtkRenderer>::New();
+  vtkSmartPointer<vtkRenderWindow> renWin = vtkSmartPointer<vtkRenderWindow>::New();
   renWin->AddRenderer(renderer);
 
   // Connect it all. Note that funny arithematic on the
@@ -262,25 +264,25 @@ int main(int argc, char *argv[])
   // allocated time across all renderers, and the renderer
   // divides it time across all props. If clip is
   // true then there are two props
-  vtkRenderWindowInteractor *iren = vtkRenderWindowInteractor::New();
+  vtkSmartPointer<vtkRenderWindowInteractor> iren = vtkSmartPointer<vtkRenderWindowInteractor>::New();
   iren->SetRenderWindow(renWin);
   iren->SetDesiredUpdateRate(frameRate / (1+clip) );
 
   iren->GetInteractorStyle()->SetDefaultRenderer(renderer);
 
   // Read the data
-  vtkAlgorithm *reader=0;
-  vtkImageData *input=0;
+  vtkSmartPointer<vtkAlgorithm> reader=0;
+  vtkSmartPointer<vtkImageData> input=0;
   if(dirname)
     {
-    vtkDICOMImageReader *dicomReader = vtkDICOMImageReader::New();
+    vtkSmartPointer<vtkDICOMImageReader> dicomReader = vtkSmartPointer<vtkDICOMImageReader>::New();
     dicomReader->SetDirectoryName(dirname);
     dicomReader->Update();
     input=dicomReader->GetOutput();
     reader=dicomReader;
     }
     else if ( fileType == NIFTI_FILETYPE ){
-      vtkNIFTIImageReader *niftreader = vtkNIFTIImageReader::New();
+      vtkSmartPointer<vtkNIFTIImageReader> niftreader = vtkSmartPointer<vtkNIFTIImageReader>::New();
       niftreader->SetFileName(fileName);
       niftreader->Update();
       input=niftreader->GetOutput();
@@ -288,7 +290,7 @@ int main(int argc, char *argv[])
     }
   else if ( fileType == VTI_FILETYPE )
     {
-    vtkXMLImageDataReader *xmlReader = vtkXMLImageDataReader::New();
+    vtkSmartPointer<vtkXMLImageDataReader> xmlReader = vtkSmartPointer<vtkXMLImageDataReader>::New();
     xmlReader->SetFileName(fileName);
     xmlReader->Update();
     input=xmlReader->GetOutput();
@@ -296,7 +298,7 @@ int main(int argc, char *argv[])
     }
   else if ( fileType == MHA_FILETYPE )
     {
-    vtkMetaImageReader *metaReader = vtkMetaImageReader::New();
+    vtkSmartPointer<vtkMetaImageReader> metaReader = vtkSmartPointer<vtkMetaImageReader>::New();
     metaReader->SetFileName(fileName);
     metaReader->Update();
     input=metaReader->GetOutput();
@@ -319,7 +321,7 @@ int main(int argc, char *argv[])
     exit(EXIT_FAILURE);
     }
 
-  vtkImageResample *resample = vtkImageResample::New();
+  vtkSmartPointer<vtkImageResample> resample = vtkSmartPointer<vtkImageResample>::New();
   if ( reductionFactor < 1.0 )
     {
     resample->SetInputConnection( reader->GetOutputPort() );
@@ -329,11 +331,11 @@ int main(int argc, char *argv[])
     }
 
   // Create our volume and mapper
-  vtkVolume *volume = vtkVolume::New();
-  vtkSmartVolumeMapper *mapper = vtkSmartVolumeMapper::New();
+  vtkSmartPointer<vtkVolume> volume = vtkSmartPointer<vtkVolume>::New();
+  vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
 
   // Add a box widget if the clip option was selected
-  vtkBoxWidget *box = vtkBoxWidget::New();
+  vtkSmartPointer<vtkBoxWidget> box = vtkSmartPointer<vtkBoxWidget>::New();
   if (clip)
     {
     box->SetInteractor(iren);
@@ -384,11 +386,11 @@ int main(int argc, char *argv[])
 
 
   // Create our transfer function
-  vtkColorTransferFunction *colorFun = vtkColorTransferFunction::New();
-  vtkPiecewiseFunction *opacityFun = vtkPiecewiseFunction::New();
+  vtkSmartPointer<vtkColorTransferFunction> colorFun = vtkSmartPointer<vtkColorTransferFunction>::New();
+  vtkSmartPointer<vtkPiecewiseFunction> opacityFun = vtkSmartPointer<vtkPiecewiseFunction>::New();
 
   // Create the property and attach the transfer functions
-  vtkVolumeProperty *property = vtkVolumeProperty::New();
+  vtkSmartPointer<vtkVolumeProperty> property = vtkSmartPointer<vtkVolumeProperty>::New();
   property->SetIndependentComponents(independentComponents);
   property->SetColor( colorFun );
   property->SetScalarOpacity( opacityFun );
@@ -546,18 +548,6 @@ int main(int argc, char *argv[])
 
   iren->Start();
 
-  opacityFun->Delete();
-  colorFun->Delete();
-  property->Delete();
-
-  box->Delete();
-  volume->Delete();
-  mapper->Delete();
-  reader->Delete();
-  resample->Delete();
-  renderer->Delete();
-  renWin->Delete();
-  iren->Delete();
 
   return 0;
 }
