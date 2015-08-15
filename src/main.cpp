@@ -1,3 +1,4 @@
+#include <QApplication>
 /*=========================================================================
 
   Program:   Visualization Toolkit
@@ -13,6 +14,7 @@
 
 =========================================================================*/
 // VTK includes
+
 #include "vtkBoxWidget.h"
 #include "vtkCamera.h"
 #include "vtkCommand.h"
@@ -36,6 +38,7 @@
 #include "vtkImagePlaneWidget.h"
 #include "vtkInteractorStyleUser.h"
 
+/*
 #define VTI_FILETYPE 1
 #define MHA_FILETYPE 2
 #define NIFTI_FILETYPE 3
@@ -115,7 +118,13 @@ void PrintUsage()
   int i = 0;
   cin >> i;
 }
+*/
+int main(int argc, char *argv[]){
+    QApplication app(argc,argv);
+    return(app.exec());
+}
 
+/*
 int main(int argc, char *argv[])
 {
   // Parse the parameters
@@ -573,10 +582,11 @@ int main(int argc, char *argv[])
   // interact with data
   renWin->Render();
 
-   iplane->On();
+  iplane->On();
 
   iren->Start();
 
 
   return 0;
 }
+*/

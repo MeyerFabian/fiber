@@ -29,3 +29,5 @@ Will probably feature QT for GUI, examples can be found here: http://www.vtk.org
 
 3 Plane Slicing example, as its done in a lot of fiber tracking examples to have some anatomy reference in addition to the fibers:
 http://www.vtk.org/gitweb?p=VTK.git;a=blob;f=Examples/GUI/Qt/FourPaneViewer/QtVTKRenderWindows.cxx;h=3e94b312d5a5d9b3bfaacdc1f0142df09086326c;hb=HEAD
+
+B-Spline Generation to create fibers from points using VTK: http://www.vtkjournal.org/browse/publication/790
