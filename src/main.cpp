@@ -411,8 +411,7 @@ int main(int argc, char *argv[])
           iplane->SetPlaneOrientation(1);
 
           iplane->SetDefaultRenderer(renderer);
-        //  iplane->UpdatePlacement();
-
+          iplane->UpdatePlacement();
         }
 
       if ( reductionFactor < 1.0 )
@@ -591,8 +590,10 @@ int main(int argc, char *argv[])
 
 
       renWin->AddRenderer(renderer);
+      renWin->SetInteractor(iren);
+      uimw->qvtkwidget->SetRenderWindow(renWin);
 
-      uimw->qvtkwidget->GetRenderWindow()->AddRenderer(renderer);
+     // uimw->qvtkwidget->GetInteractor()->AddInteractor(iren);
 
       renderer->AddVolume( volume );
 
@@ -600,9 +601,9 @@ int main(int argc, char *argv[])
 
       iplane->On();
 
-      //uimw->qvtkwidget->GetRenderWindow()->SetInteractor(iren);
-
       mainWindow.show();
+
+      renWin->Render();
 
 
     return a.exec();
