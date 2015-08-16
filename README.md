@@ -16,9 +16,9 @@ INSTALLATION:
 
 2.  Download and install VTK from http://www.vtk.org/download/ using CMake and Visual Studio 2013.
 
-2.1 Check the box VTK_Group_Qt to use Qt with VTK
+    2.1 Check the box VTK_Group_Qt to use Qt with VTK
 
-        2.1.1 If you run into errors linking with Microsoft Devolpment Kit uncheck the DirectX directory in CMake.
+    2.1.1 If you run into errors linking with Microsoft Devolpment Kit uncheck the DirectX directory in CMake.
 
 3.  Clone this repository and build it using cmake and your compiler of choice and link it with VTK.
 
