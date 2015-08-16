@@ -18,7 +18,7 @@ INSTALLATION:
 
 2.1 Check the box VTK_Group_Qt to use Qt with VTK
 
-	- If you run into errors linking with Microsoft Devolpment Kit uncheck the DirectX directory in CMake.
+        2.1.1 If you run into errors linking with Microsoft Devolpment Kit uncheck the DirectX directory in CMake.
 
 3.  Clone this repository and build it using cmake and your compiler of choice and link it with VTK.
 
