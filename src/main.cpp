@@ -16,7 +16,7 @@
 
 =========================================================================*/
 // VTK includes
-/*
+
 #include "vtkBoxWidget.h"
 #include "vtkCamera.h"
 #include "vtkCommand.h"
@@ -120,7 +120,7 @@ void PrintUsage()
   int i = 0;
   cin >> i;
 }
-*/
+
 
 #include <vtkAutoInit.h>
 VTK_MODULE_INIT(vtkRenderingOpenGL)
@@ -146,497 +146,464 @@ int main(int argc, char *argv[])
       Ui::MainWindow* uimw = new Ui::MainWindow();
       uimw->setupUi(&mainWindow);
 
-      // Setup sphere
-      vtkSmartPointer<vtkSphereSource> sphereSource =
-          vtkSmartPointer<vtkSphereSource>::New();
-      sphereSource->Update();
-      vtkSmartPointer<vtkPolyDataMapper> sphereMapper =
-          vtkSmartPointer<vtkPolyDataMapper>::New();
-      sphereMapper->SetInputConnection(sphereSource->GetOutputPort());
-      vtkSmartPointer<vtkActor> sphereActor =
-          vtkSmartPointer<vtkActor>::New();
-      sphereActor->GetProperty()->SetFrontfaceCulling(true);
-      sphereActor->SetMapper(sphereMapper);
+      // Parse the parameters
 
-      // Setup window
-      vtkSmartPointer<vtkRenderWindow> renderWindow =
-          vtkSmartPointer<vtkRenderWindow>::New();
+      int count = 1;
+      char *dirname = NULL;
+      double opacityWindow = 4096;
+      double opacityLevel = 2048;
+      int blendType = 0;
+      int clip = 0;
+      double reductionFactor = 1.0;
+      double frameRate = 10.0;
+      char *fileName=0;
+      int fileType=0;
+      int imageplane=0;
 
-      // Setup renderer
-      vtkSmartPointer<vtkRenderer> renderer =
-          vtkSmartPointer<vtkRenderer>::New();
-      renderWindow->AddRenderer(renderer);
+      bool independentComponents=true;
+
+      while ( count < argc )
+        {
+        if ( !strcmp( argv[count], "?" ) )
+          {
+          PrintUsage();
+          exit(EXIT_SUCCESS);
+          }
+        else if ( !strcmp( argv[count], "-DICOM" ) )
+          {
+          dirname = new char[strlen(argv[count+1])+1];
+          sprintf( dirname, "%s", argv[count+1] );
+          count += 2;
+          }
+        else if ( !strcmp( argv[count], "-VTI" ) )
+          {
+          fileName = new char[strlen(argv[count+1])+1];
+          fileType = VTI_FILETYPE;
+          sprintf( fileName, "%s", argv[count+1] );
+          count += 2;
+          }
+          else if ( !strcmp( argv[count], "-NIFTI" ) )
+            {
+            fileName = new char[strlen(argv[count+1])+1];
+            fileType = NIFTI_FILETYPE;
+            sprintf( fileName, "%s", argv[count+1] );
+            count += 2;
+            }
+        else if ( !strcmp( argv[count], "-MHA" ) )
+          {
+          fileName = new char[strlen(argv[count+1])+1];
+          fileType = MHA_FILETYPE;
+          sprintf( fileName, "%s", argv[count+1] );
+          count += 2;
+          }
+        else if ( !strcmp( argv[count], "-Clip") )
+          {
+          clip = 1;
+          count++;
+          }
+          else if ( !strcmp( argv[count], "-Imageplane") )
+            {
+          imageplane = 1;
+            count++;
+            }
+        else if ( !strcmp( argv[count], "-MIP" ) )
+          {
+          opacityWindow = atof( argv[count+1] );
+          opacityLevel  = atof( argv[count+2] );
+          blendType = 0;
+          count += 3;
+          }
+        else if ( !strcmp( argv[count], "-CompositeRamp" ) )
+          {
+          opacityWindow = atof( argv[count+1] );
+          opacityLevel  = atof( argv[count+2] );
+          blendType = 1;
+          count += 3;
+          }
+        else if ( !strcmp( argv[count], "-CompositeShadeRamp" ) )
+          {
+          opacityWindow = atof( argv[count+1] );
+          opacityLevel  = atof( argv[count+2] );
+          blendType = 2;
+          count += 3;
+          }
+        else if ( !strcmp( argv[count], "-CT_Skin" ) )
+          {
+          blendType = 3;
+          count += 1;
+          }
+        else if ( !strcmp( argv[count], "-CT_Bone" ) )
+          {
+          blendType = 4;
+          count += 1;
+          }
+        else if ( !strcmp( argv[count], "-CT_Muscle" ) )
+          {
+          blendType = 5;
+          count += 1;
+          }
+        else if ( !strcmp( argv[count], "-RGB_Composite" ) )
+          {
+          blendType = 6;
+          count += 1;
+          }
+        else if ( !strcmp( argv[count], "-FrameRate") )
+          {
+          frameRate = atof( argv[count+1] );
+          if ( frameRate < 0.01 || frameRate > 60.0 )
+            {
+            cout << "Invalid frame rate - use a number between 0.01 and 60.0" << endl;
+            cout << "Using default frame rate of 10 frames per second." << endl;
+            frameRate = 10.0;
+            }
+          count += 2;
+          }
+        else if ( !strcmp( argv[count], "-ReductionFactor") )
+          {
+          reductionFactor = atof( argv[count+1] );
+          if ( reductionFactor <= 0.0 || reductionFactor >= 1.0 )
+            {
+            cout << "Invalid reduction factor - use a number between 0 and 1 (exclusive)" << endl;
+            cout << "Using the default of no reduction." << endl;
+            reductionFactor = 1.0;
+            }
+          count += 2;
+          }
+         else if ( !strcmp( argv[count], "-DependentComponents") )
+          {
+          independentComponents=false;
+          count += 1;
+          }
+        else
+          {
+          cout << "Unrecognized option: " << argv[count] << endl;
+          cout << endl;
+          PrintUsage();
+          exit(EXIT_FAILURE);
+          }
+        }
+
+      if ( !dirname && !fileName)
+        {
+        cout << "Error: you must specify a directory of DICOM data or a .vti file or a .mha!" << endl;
+        cout << endl;
+        PrintUsage();
+        exit(EXIT_FAILURE);
+        }
+
+      // Create the renderer, render window and interactor
+      vtkSmartPointer<vtkRenderer> renderer = vtkSmartPointer<vtkRenderer>::New();
+      vtkSmartPointer<vtkRenderWindow> renWin = vtkSmartPointer<vtkRenderWindow>::New();
+      renWin->AddRenderer(renderer);
+
+      // Connect it all. Note that funny arithematic on the
+      // SetDesiredUpdateRate - the vtkRenderWindow divides it
+      // allocated time across all renderers, and the renderer
+      // divides it time across all props. If clip is
+      // true then there are two props
+      vtkSmartPointer<vtkRenderWindowInteractor> iren = vtkSmartPointer<vtkRenderWindowInteractor>::New();
+      iren->SetRenderWindow(renWin);
+      iren->SetDesiredUpdateRate(frameRate / (1+clip) );
+      iren->GetInteractorStyle()->SetDefaultRenderer(renderer);
+
+      // Read the data
+      vtkSmartPointer<vtkAlgorithm> reader=0;
+      vtkSmartPointer<vtkImageData> input=0;
+      if(dirname)
+        {
+        vtkSmartPointer<vtkDICOMImageReader> dicomReader = vtkSmartPointer<vtkDICOMImageReader>::New();
+        dicomReader->SetDirectoryName(dirname);
+        dicomReader->Update();
+        input=dicomReader->GetOutput();
+        reader=dicomReader;
+        }
+        else if ( fileType == NIFTI_FILETYPE ){
+          vtkSmartPointer<vtkNIFTIImageReader> niftreader = vtkSmartPointer<vtkNIFTIImageReader>::New();
+          niftreader->SetFileName(fileName);
+          niftreader->Update();
+          input=niftreader->GetOutput();
+          reader=niftreader;
+        }
+      else if ( fileType == VTI_FILETYPE )
+        {
+        vtkSmartPointer<vtkXMLImageDataReader> xmlReader = vtkSmartPointer<vtkXMLImageDataReader>::New();
+        xmlReader->SetFileName(fileName);
+        xmlReader->Update();
+        input=xmlReader->GetOutput();
+        reader=xmlReader;
+        }
+      else if ( fileType == MHA_FILETYPE )
+        {
+        vtkSmartPointer<vtkMetaImageReader> metaReader = vtkSmartPointer<vtkMetaImageReader>::New();
+        metaReader->SetFileName(fileName);
+        metaReader->Update();
+        input=metaReader->GetOutput();
+        reader=metaReader;
+        }
+      else
+        {
+        cout << "Error! Not VTI or MHA!" << endl;
+        exit(EXIT_FAILURE);
+        }
+
+      // Verify that we actually have a volume
+      int dim[3];
+      input->GetDimensions(dim);
+      if ( dim[0] < 2 ||
+           dim[1] < 2 ||
+           dim[2] < 2 )
+        {
+        cout << "Error loading data!" << endl;
+        exit(EXIT_FAILURE);
+        }
+
+      vtkSmartPointer<vtkImageResample> resample = vtkSmartPointer<vtkImageResample>::New();
+      if ( reductionFactor < 1.0 )
+        {
+        resample->SetInputConnection( reader->GetOutputPort() );
+        resample->SetAxisMagnificationFactor(0, reductionFactor);
+        resample->SetAxisMagnificationFactor(1, reductionFactor);
+        resample->SetAxisMagnificationFactor(2, reductionFactor);
+        }
+
+      // Create our volume and mapper
+      vtkSmartPointer<vtkVolume> volume = vtkSmartPointer<vtkVolume>::New();
+      vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
+
+      // Add a box widget if the clip option was selected
+     vtkSmartPointer<vtkBoxWidget> box = vtkSmartPointer<vtkBoxWidget>::New();
+
+      if (clip)
+        {
+        box->SetInteractor(iren);
+        box->SetPlaceFactor(1.01);
+        if ( reductionFactor < 1.0 )
+          {
+          box->SetInputConnection(resample->GetOutputPort());
+          }
+        else
+          {
+          box->SetInputData(input);
+          }
+
+        box->SetDefaultRenderer(renderer);
+        box->InsideOutOn();
+        box->PlaceWidget();
+        vtkBoxWidgetCallback *callback = vtkBoxWidgetCallback::New();
+        callback->SetMapper(mapper);
+        box->AddObserver(vtkCommand::InteractionEvent, callback);
+        callback->Delete();
+        box->EnabledOn();
+        box->GetSelectedFaceProperty()->SetOpacity(0.0);
+        }
+
+      vtkSmartPointer<vtkImagePlaneWidget> iplane = vtkSmartPointer<vtkImagePlaneWidget>::New();
+      vtkSmartPointer<vtkProperty> ipwProp = vtkSmartPointer<vtkProperty>::New();
+      iplane->SetInteractor(iren);
+      iplane->SetInputConnection(reader->GetOutputPort());
+        if(imageplane)
+        {
+
+          iplane->RestrictPlaneToVolumeOn();
+          double color[3] = {0,1,0};
+          iplane->GetPlaneProperty()->SetColor(color);
+          //double origin[3] ={0,1,0};
+          iplane->SetPlaneOrientation(1);
+
+          iplane->SetDefaultRenderer(renderer);
+        //  iplane->UpdatePlacement();
+
+        }
+
+      if ( reductionFactor < 1.0 )
+        {
+        mapper->SetInputConnection( resample->GetOutputPort() );
+        }
+      else
+        {
+        mapper->SetInputConnection( reader->GetOutputPort() );
+        }
+
+
+      // Set the sample distance on the ray to be 1/2 the average spacing
+      double spacing[3];
+      if ( reductionFactor < 1.0 )
+        {
+        resample->GetOutput()->GetSpacing(spacing);
+        }
+      else
+        {
+        input->GetSpacing(spacing);
+        }
+
+    //  mapper->SetSampleDistance( (spacing[0]+spacing[1]+spacing[2])/6.0 );
+    //  mapper->SetMaximumImageSampleDistance(10.0);
+
+
+      // Create our transfer function
+      vtkSmartPointer<vtkColorTransferFunction> colorFun = vtkSmartPointer<vtkColorTransferFunction>::New();
+      vtkSmartPointer<vtkPiecewiseFunction> opacityFun = vtkSmartPointer<vtkPiecewiseFunction>::New();
+
+      // Create the property and attach the transfer functions
+      vtkSmartPointer<vtkVolumeProperty> property = vtkSmartPointer<vtkVolumeProperty>::New();
+      property->SetIndependentComponents(independentComponents);
+      property->SetColor( colorFun );
+      property->SetScalarOpacity( opacityFun );
+      property->SetInterpolationTypeToLinear();
+
+      // connect up the volume to the property and the mapper
+      volume->SetProperty( property );
+      volume->SetMapper( mapper );
+
+      // Depending on the blend type selected as a command line option,
+      // adjust the transfer function
+      switch ( blendType )
+        {
+        // MIP
+        // Create an opacity ramp from the window and level values.
+        // Color is white. Blending is MIP.
+        case 0:
+          colorFun->AddRGBSegment(0.0, 1.0, 1.0, 1.0, 255.0, 1.0, 1.0, 1.0 );
+          opacityFun->AddSegment( opacityLevel - 0.5*opacityWindow, 0.0,
+                                  opacityLevel + 0.5*opacityWindow, 1.0 );
+          mapper->SetBlendModeToMaximumIntensity();
+          break;
+
+        // CompositeRamp
+        // Create a ramp from the window and level values. Use compositing
+        // without shading. Color is a ramp from black to white.
+        case 1:
+          colorFun->AddRGBSegment(opacityLevel - 0.5*opacityWindow, 0.0, 0.0, 0.0,
+                                  opacityLevel + 0.5*opacityWindow, 1.0, 1.0, 1.0 );
+          opacityFun->AddSegment( opacityLevel - 0.5*opacityWindow, 0.0,
+                                  opacityLevel + 0.5*opacityWindow, 1.0 );
+          mapper->SetBlendModeToComposite();
+          property->ShadeOff();
+          break;
+
+        // CompositeShadeRamp
+        // Create a ramp from the window and level values. Use compositing
+        // with shading. Color is white.
+        case 2:
+          colorFun->AddRGBSegment(0.0, 1.0, 1.0, 1.0, 255.0, 1.0, 1.0, 1.0 );
+          opacityFun->AddSegment( opacityLevel - 0.5*opacityWindow, 0.0,
+                                  opacityLevel + 0.5*opacityWindow, 1.0 );
+          mapper->SetBlendModeToComposite();
+          property->ShadeOn();
+          break;
+
+        // CT_Skin
+        // Use compositing and functions set to highlight skin in CT data
+        // Not for use on RGB data
+        case 3:
+          colorFun->AddRGBPoint( -3024, 0, 0, 0, 0.5, 0.0 );
+          colorFun->AddRGBPoint( -1000, .62, .36, .18, 0.5, 0.0 );
+          colorFun->AddRGBPoint( -500, .88, .60, .29, 0.33, 0.45 );
+          colorFun->AddRGBPoint( 3071, .83, .66, 1, 0.5, 0.0 );
+
+          opacityFun->AddPoint(-3024, 0, 0.5, 0.0 );
+          opacityFun->AddPoint(-1000, 0, 0.5, 0.0 );
+          opacityFun->AddPoint(-500, 1.0, 0.33, 0.45 );
+          opacityFun->AddPoint(3071, 1.0, 0.5, 0.0);
+
+          mapper->SetBlendModeToComposite();
+          property->ShadeOn();
+          property->SetAmbient(0.1);
+          property->SetDiffuse(0.9);
+          property->SetSpecular(0.2);
+          property->SetSpecularPower(10.0);
+          property->SetScalarOpacityUnitDistance(0.8919);
+          break;
+
+        // CT_Bone
+        // Use compositing and functions set to highlight bone in CT data
+        // Not for use on RGB data
+        case 4:
+          colorFun->AddRGBPoint( -3024, 0, 0, 0, 0.5, 0.0 );
+          colorFun->AddRGBPoint( -16, 0.73, 0.25, 0.30, 0.49, .61 );
+          colorFun->AddRGBPoint( 641, .90, .82, .56, .5, 0.0 );
+          colorFun->AddRGBPoint( 3071, 1, 1, 1, .5, 0.0 );
+
+          opacityFun->AddPoint(-3024, 0, 0.5, 0.0 );
+          opacityFun->AddPoint(-16, 0, .49, .61 );
+          opacityFun->AddPoint(641, .72, .5, 0.0 );
+          opacityFun->AddPoint(3071, .71, 0.5, 0.0);
+
+          mapper->SetBlendModeToComposite();
+          property->ShadeOn();
+          property->SetAmbient(0.1);
+          property->SetDiffuse(0.9);
+          property->SetSpecular(0.2);
+          property->SetSpecularPower(10.0);
+          property->SetScalarOpacityUnitDistance(0.8919);
+          break;
+
+        // CT_Muscle
+        // Use compositing and functions set to highlight muscle in CT data
+        // Not for use on RGB data
+        case 5:
+          colorFun->AddRGBPoint( -3024, 0, 0, 0, 0.5, 0.0 );
+          colorFun->AddRGBPoint( -155, .55, .25, .15, 0.5, .92 );
+          colorFun->AddRGBPoint( 217, .88, .60, .29, 0.33, 0.45 );
+          colorFun->AddRGBPoint( 420, 1, .94, .95, 0.5, 0.0 );
+          colorFun->AddRGBPoint( 3071, .83, .66, 1, 0.5, 0.0 );
+
+          opacityFun->AddPoint(-3024, 0, 0.5, 0.0 );
+          opacityFun->AddPoint(-155, 0, 0.5, 0.92 );
+          opacityFun->AddPoint(217, .68, 0.33, 0.45 );
+          opacityFun->AddPoint(420,.83, 0.5, 0.0);
+          opacityFun->AddPoint(3071, .80, 0.5, 0.0);
+
+          mapper->SetBlendModeToComposite();
+          property->ShadeOn();
+          property->SetAmbient(0.1);
+          property->SetDiffuse(0.9);
+          property->SetSpecular(0.2);
+          property->SetSpecularPower(10.0);
+          property->SetScalarOpacityUnitDistance(0.8919);
+          break;
+
+        // RGB_Composite
+        // Use compositing and functions set to highlight red/green/blue regions
+        // in RGB data. Not for use on single component data
+        case 6:
+          opacityFun->AddPoint(0, 0.0);
+          opacityFun->AddPoint(5.0, 0.0);
+          opacityFun->AddPoint(30.0, 0.05);
+          opacityFun->AddPoint(31.0, 0.0);
+          opacityFun->AddPoint(90.0, 0.0);
+          opacityFun->AddPoint(100.0, 0.3);
+          opacityFun->AddPoint(110.0, 0.0);
+          opacityFun->AddPoint(190.0, 0.0);
+          opacityFun->AddPoint(200.0, 0.4);
+          opacityFun->AddPoint(210.0, 0.0);
+          opacityFun->AddPoint(245.0, 0.0);
+          opacityFun->AddPoint(255.0, 0.5);
+
+          mapper->SetBlendModeToComposite();
+          property->ShadeOff();
+          property->SetScalarOpacityUnitDistance(1.0);
+          break;
+        default:
+           vtkGenericWarningMacro("Unknown blend type.");
+           break;
+        }
+
+
+      renWin->AddRenderer(renderer);
 
       uimw->qvtkwidget->GetRenderWindow()->AddRenderer(renderer);
 
-      renderer->AddActor(sphereActor);
+      renderer->AddVolume( volume );
+
       renderer->ResetCamera();
+
+      iplane->On();
+
+      //uimw->qvtkwidget->GetRenderWindow()->SetInteractor(iren);
+
       mainWindow.show();
+
+
     return a.exec();
 }
-/*
-int main(int argc, char *argv[])
-{
-  // Parse the parameters
-
-  int count = 1;
-  char *dirname = NULL;
-  double opacityWindow = 4096;
-  double opacityLevel = 2048;
-  int blendType = 0;
-  int clip = 0;
-  double reductionFactor = 1.0;
-  double frameRate = 10.0;
-  char *fileName=0;
-  int fileType=0;
-  int imageplane=0;
-
-  bool independentComponents=true;
-
-  while ( count < argc )
-    {
-    if ( !strcmp( argv[count], "?" ) )
-      {
-      PrintUsage();
-      exit(EXIT_SUCCESS);
-      }
-    else if ( !strcmp( argv[count], "-DICOM" ) )
-      {
-      dirname = new char[strlen(argv[count+1])+1];
-      sprintf( dirname, "%s", argv[count+1] );
-      count += 2;
-      }
-    else if ( !strcmp( argv[count], "-VTI" ) )
-      {
-      fileName = new char[strlen(argv[count+1])+1];
-      fileType = VTI_FILETYPE;
-      sprintf( fileName, "%s", argv[count+1] );
-      count += 2;
-      }
-      else if ( !strcmp( argv[count], "-NIFTI" ) )
-        {
-        fileName = new char[strlen(argv[count+1])+1];
-        fileType = NIFTI_FILETYPE;
-        sprintf( fileName, "%s", argv[count+1] );
-        count += 2;
-        }
-    else if ( !strcmp( argv[count], "-MHA" ) )
-      {
-      fileName = new char[strlen(argv[count+1])+1];
-      fileType = MHA_FILETYPE;
-      sprintf( fileName, "%s", argv[count+1] );
-      count += 2;
-      }
-    else if ( !strcmp( argv[count], "-Clip") )
-      {
-      clip = 1;
-      count++;
-      }
-      else if ( !strcmp( argv[count], "-Imageplane") )
-        {
-      imageplane = 1;
-        count++;
-        }
-    else if ( !strcmp( argv[count], "-MIP" ) )
-      {
-      opacityWindow = atof( argv[count+1] );
-      opacityLevel  = atof( argv[count+2] );
-      blendType = 0;
-      count += 3;
-      }
-    else if ( !strcmp( argv[count], "-CompositeRamp" ) )
-      {
-      opacityWindow = atof( argv[count+1] );
-      opacityLevel  = atof( argv[count+2] );
-      blendType = 1;
-      count += 3;
-      }
-    else if ( !strcmp( argv[count], "-CompositeShadeRamp" ) )
-      {
-      opacityWindow = atof( argv[count+1] );
-      opacityLevel  = atof( argv[count+2] );
-      blendType = 2;
-      count += 3;
-      }
-    else if ( !strcmp( argv[count], "-CT_Skin" ) )
-      {
-      blendType = 3;
-      count += 1;
-      }
-    else if ( !strcmp( argv[count], "-CT_Bone" ) )
-      {
-      blendType = 4;
-      count += 1;
-      }
-    else if ( !strcmp( argv[count], "-CT_Muscle" ) )
-      {
-      blendType = 5;
-      count += 1;
-      }
-    else if ( !strcmp( argv[count], "-RGB_Composite" ) )
-      {
-      blendType = 6;
-      count += 1;
-      }
-    else if ( !strcmp( argv[count], "-FrameRate") )
-      {
-      frameRate = atof( argv[count+1] );
-      if ( frameRate < 0.01 || frameRate > 60.0 )
-        {
-        cout << "Invalid frame rate - use a number between 0.01 and 60.0" << endl;
-        cout << "Using default frame rate of 10 frames per second." << endl;
-        frameRate = 10.0;
-        }
-      count += 2;
-      }
-    else if ( !strcmp( argv[count], "-ReductionFactor") )
-      {
-      reductionFactor = atof( argv[count+1] );
-      if ( reductionFactor <= 0.0 || reductionFactor >= 1.0 )
-        {
-        cout << "Invalid reduction factor - use a number between 0 and 1 (exclusive)" << endl;
-        cout << "Using the default of no reduction." << endl;
-        reductionFactor = 1.0;
-        }
-      count += 2;
-      }
-     else if ( !strcmp( argv[count], "-DependentComponents") )
-      {
-      independentComponents=false;
-      count += 1;
-      }
-    else
-      {
-      cout << "Unrecognized option: " << argv[count] << endl;
-      cout << endl;
-      PrintUsage();
-      exit(EXIT_FAILURE);
-      }
-    }
-
-  if ( !dirname && !fileName)
-    {
-    cout << "Error: you must specify a directory of DICOM data or a .vti file or a .mha!" << endl;
-    cout << endl;
-    PrintUsage();
-    exit(EXIT_FAILURE);
-    }
-
-  // Create the renderer, render window and interactor
-  vtkSmartPointer<vtkRenderer> renderer = vtkSmartPointer<vtkRenderer>::New();
-  vtkSmartPointer<vtkRenderWindow> renWin = vtkSmartPointer<vtkRenderWindow>::New();
-  renWin->AddRenderer(renderer);
-
-  // Connect it all. Note that funny arithematic on the
-  // SetDesiredUpdateRate - the vtkRenderWindow divides it
-  // allocated time across all renderers, and the renderer
-  // divides it time across all props. If clip is
-  // true then there are two props
-  vtkSmartPointer<vtkRenderWindowInteractor> iren = vtkSmartPointer<vtkRenderWindowInteractor>::New();
-  iren->SetRenderWindow(renWin);
-  iren->SetDesiredUpdateRate(frameRate / (1+clip) );
-  iren->GetInteractorStyle()->SetDefaultRenderer(renderer);
-
-  // Read the data
-  vtkSmartPointer<vtkAlgorithm> reader=0;
-  vtkSmartPointer<vtkImageData> input=0;
-  if(dirname)
-    {
-    vtkSmartPointer<vtkDICOMImageReader> dicomReader = vtkSmartPointer<vtkDICOMImageReader>::New();
-    dicomReader->SetDirectoryName(dirname);
-    dicomReader->Update();
-    input=dicomReader->GetOutput();
-    reader=dicomReader;
-    }
-    else if ( fileType == NIFTI_FILETYPE ){
-      vtkSmartPointer<vtkNIFTIImageReader> niftreader = vtkSmartPointer<vtkNIFTIImageReader>::New();
-      niftreader->SetFileName(fileName);
-      niftreader->Update();
-      input=niftreader->GetOutput();
-      reader=niftreader;
-    }
-  else if ( fileType == VTI_FILETYPE )
-    {
-    vtkSmartPointer<vtkXMLImageDataReader> xmlReader = vtkSmartPointer<vtkXMLImageDataReader>::New();
-    xmlReader->SetFileName(fileName);
-    xmlReader->Update();
-    input=xmlReader->GetOutput();
-    reader=xmlReader;
-    }
-  else if ( fileType == MHA_FILETYPE )
-    {
-    vtkSmartPointer<vtkMetaImageReader> metaReader = vtkSmartPointer<vtkMetaImageReader>::New();
-    metaReader->SetFileName(fileName);
-    metaReader->Update();
-    input=metaReader->GetOutput();
-    reader=metaReader;
-    }
-  else
-    {
-    cout << "Error! Not VTI or MHA!" << endl;
-    exit(EXIT_FAILURE);
-    }
-
-  // Verify that we actually have a volume
-  int dim[3];
-  input->GetDimensions(dim);
-  if ( dim[0] < 2 ||
-       dim[1] < 2 ||
-       dim[2] < 2 )
-    {
-    cout << "Error loading data!" << endl;
-    exit(EXIT_FAILURE);
-    }
-
-  vtkSmartPointer<vtkImageResample> resample = vtkSmartPointer<vtkImageResample>::New();
-  if ( reductionFactor < 1.0 )
-    {
-    resample->SetInputConnection( reader->GetOutputPort() );
-    resample->SetAxisMagnificationFactor(0, reductionFactor);
-    resample->SetAxisMagnificationFactor(1, reductionFactor);
-    resample->SetAxisMagnificationFactor(2, reductionFactor);
-    }
-
-  // Create our volume and mapper
-  vtkSmartPointer<vtkVolume> volume = vtkSmartPointer<vtkVolume>::New();
-  vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
-
-  // Add a box widget if the clip option was selected
- vtkSmartPointer<vtkBoxWidget> box = vtkSmartPointer<vtkBoxWidget>::New();
-
-  if (clip)
-    {
-    box->SetInteractor(iren);
-    box->SetPlaceFactor(1.01);
-    if ( reductionFactor < 1.0 )
-      {
-      box->SetInputConnection(resample->GetOutputPort());
-      }
-    else
-      {
-      box->SetInputData(input);
-      }
-
-    box->SetDefaultRenderer(renderer);
-    box->InsideOutOn();
-    box->PlaceWidget();
-    vtkBoxWidgetCallback *callback = vtkBoxWidgetCallback::New();
-    callback->SetMapper(mapper);
-    box->AddObserver(vtkCommand::InteractionEvent, callback);
-    callback->Delete();
-    box->EnabledOn();
-    box->GetSelectedFaceProperty()->SetOpacity(0.0);
-    }
-
-  vtkSmartPointer<vtkImagePlaneWidget> iplane = vtkSmartPointer<vtkImagePlaneWidget>::New();
-  vtkSmartPointer<vtkProperty> ipwProp = vtkSmartPointer<vtkProperty>::New();
-  iplane->SetInteractor(iren);
-  iplane->SetInputConnection(reader->GetOutputPort());
-    if(imageplane)
-    {
-
-      iplane->RestrictPlaneToVolumeOn();
-      double color[3] = {0,1,0};
-      iplane->GetPlaneProperty()->SetColor(color);
-      //double origin[3] ={0,1,0};
-      iplane->SetPlaneOrientation(1);
-
-      iplane->SetDefaultRenderer(renderer);
-    //  iplane->UpdatePlacement();
-
-    }
-
-  if ( reductionFactor < 1.0 )
-    {
-    mapper->SetInputConnection( resample->GetOutputPort() );
-    }
-  else
-    {
-    mapper->SetInputConnection( reader->GetOutputPort() );
-    }
-
-
-  // Set the sample distance on the ray to be 1/2 the average spacing
-  double spacing[3];
-  if ( reductionFactor < 1.0 )
-    {
-    resample->GetOutput()->GetSpacing(spacing);
-    }
-  else
-    {
-    input->GetSpacing(spacing);
-    }
-
-//  mapper->SetSampleDistance( (spacing[0]+spacing[1]+spacing[2])/6.0 );
-//  mapper->SetMaximumImageSampleDistance(10.0);
-
-
-  // Create our transfer function
-  vtkSmartPointer<vtkColorTransferFunction> colorFun = vtkSmartPointer<vtkColorTransferFunction>::New();
-  vtkSmartPointer<vtkPiecewiseFunction> opacityFun = vtkSmartPointer<vtkPiecewiseFunction>::New();
-
-  // Create the property and attach the transfer functions
-  vtkSmartPointer<vtkVolumeProperty> property = vtkSmartPointer<vtkVolumeProperty>::New();
-  property->SetIndependentComponents(independentComponents);
-  property->SetColor( colorFun );
-  property->SetScalarOpacity( opacityFun );
-  property->SetInterpolationTypeToLinear();
-
-  // connect up the volume to the property and the mapper
-  volume->SetProperty( property );
-  volume->SetMapper( mapper );
-
-  // Depending on the blend type selected as a command line option,
-  // adjust the transfer function
-  switch ( blendType )
-    {
-    // MIP
-    // Create an opacity ramp from the window and level values.
-    // Color is white. Blending is MIP.
-    case 0:
-      colorFun->AddRGBSegment(0.0, 1.0, 1.0, 1.0, 255.0, 1.0, 1.0, 1.0 );
-      opacityFun->AddSegment( opacityLevel - 0.5*opacityWindow, 0.0,
-                              opacityLevel + 0.5*opacityWindow, 1.0 );
-      mapper->SetBlendModeToMaximumIntensity();
-      break;
-
-    // CompositeRamp
-    // Create a ramp from the window and level values. Use compositing
-    // without shading. Color is a ramp from black to white.
-    case 1:
-      colorFun->AddRGBSegment(opacityLevel - 0.5*opacityWindow, 0.0, 0.0, 0.0,
-                              opacityLevel + 0.5*opacityWindow, 1.0, 1.0, 1.0 );
-      opacityFun->AddSegment( opacityLevel - 0.5*opacityWindow, 0.0,
-                              opacityLevel + 0.5*opacityWindow, 1.0 );
-      mapper->SetBlendModeToComposite();
-      property->ShadeOff();
-      break;
-
-    // CompositeShadeRamp
-    // Create a ramp from the window and level values. Use compositing
-    // with shading. Color is white.
-    case 2:
-      colorFun->AddRGBSegment(0.0, 1.0, 1.0, 1.0, 255.0, 1.0, 1.0, 1.0 );
-      opacityFun->AddSegment( opacityLevel - 0.5*opacityWindow, 0.0,
-                              opacityLevel + 0.5*opacityWindow, 1.0 );
-      mapper->SetBlendModeToComposite();
-      property->ShadeOn();
-      break;
-
-    // CT_Skin
-    // Use compositing and functions set to highlight skin in CT data
-    // Not for use on RGB data
-    case 3:
-      colorFun->AddRGBPoint( -3024, 0, 0, 0, 0.5, 0.0 );
-      colorFun->AddRGBPoint( -1000, .62, .36, .18, 0.5, 0.0 );
-      colorFun->AddRGBPoint( -500, .88, .60, .29, 0.33, 0.45 );
-      colorFun->AddRGBPoint( 3071, .83, .66, 1, 0.5, 0.0 );
-
-      opacityFun->AddPoint(-3024, 0, 0.5, 0.0 );
-      opacityFun->AddPoint(-1000, 0, 0.5, 0.0 );
-      opacityFun->AddPoint(-500, 1.0, 0.33, 0.45 );
-      opacityFun->AddPoint(3071, 1.0, 0.5, 0.0);
-
-      mapper->SetBlendModeToComposite();
-      property->ShadeOn();
-      property->SetAmbient(0.1);
-      property->SetDiffuse(0.9);
-      property->SetSpecular(0.2);
-      property->SetSpecularPower(10.0);
-      property->SetScalarOpacityUnitDistance(0.8919);
-      break;
-
-    // CT_Bone
-    // Use compositing and functions set to highlight bone in CT data
-    // Not for use on RGB data
-    case 4:
-      colorFun->AddRGBPoint( -3024, 0, 0, 0, 0.5, 0.0 );
-      colorFun->AddRGBPoint( -16, 0.73, 0.25, 0.30, 0.49, .61 );
-      colorFun->AddRGBPoint( 641, .90, .82, .56, .5, 0.0 );
-      colorFun->AddRGBPoint( 3071, 1, 1, 1, .5, 0.0 );
-
-      opacityFun->AddPoint(-3024, 0, 0.5, 0.0 );
-      opacityFun->AddPoint(-16, 0, .49, .61 );
-      opacityFun->AddPoint(641, .72, .5, 0.0 );
-      opacityFun->AddPoint(3071, .71, 0.5, 0.0);
-
-      mapper->SetBlendModeToComposite();
-      property->ShadeOn();
-      property->SetAmbient(0.1);
-      property->SetDiffuse(0.9);
-      property->SetSpecular(0.2);
-      property->SetSpecularPower(10.0);
-      property->SetScalarOpacityUnitDistance(0.8919);
-      break;
-
-    // CT_Muscle
-    // Use compositing and functions set to highlight muscle in CT data
-    // Not for use on RGB data
-    case 5:
-      colorFun->AddRGBPoint( -3024, 0, 0, 0, 0.5, 0.0 );
-      colorFun->AddRGBPoint( -155, .55, .25, .15, 0.5, .92 );
-      colorFun->AddRGBPoint( 217, .88, .60, .29, 0.33, 0.45 );
-      colorFun->AddRGBPoint( 420, 1, .94, .95, 0.5, 0.0 );
-      colorFun->AddRGBPoint( 3071, .83, .66, 1, 0.5, 0.0 );
-
-      opacityFun->AddPoint(-3024, 0, 0.5, 0.0 );
-      opacityFun->AddPoint(-155, 0, 0.5, 0.92 );
-      opacityFun->AddPoint(217, .68, 0.33, 0.45 );
-      opacityFun->AddPoint(420,.83, 0.5, 0.0);
-      opacityFun->AddPoint(3071, .80, 0.5, 0.0);
-
-      mapper->SetBlendModeToComposite();
-      property->ShadeOn();
-      property->SetAmbient(0.1);
-      property->SetDiffuse(0.9);
-      property->SetSpecular(0.2);
-      property->SetSpecularPower(10.0);
-      property->SetScalarOpacityUnitDistance(0.8919);
-      break;
-
-    // RGB_Composite
-    // Use compositing and functions set to highlight red/green/blue regions
-    // in RGB data. Not for use on single component data
-    case 6:
-      opacityFun->AddPoint(0, 0.0);
-      opacityFun->AddPoint(5.0, 0.0);
-      opacityFun->AddPoint(30.0, 0.05);
-      opacityFun->AddPoint(31.0, 0.0);
-      opacityFun->AddPoint(90.0, 0.0);
-      opacityFun->AddPoint(100.0, 0.3);
-      opacityFun->AddPoint(110.0, 0.0);
-      opacityFun->AddPoint(190.0, 0.0);
-      opacityFun->AddPoint(200.0, 0.4);
-      opacityFun->AddPoint(210.0, 0.0);
-      opacityFun->AddPoint(245.0, 0.0);
-      opacityFun->AddPoint(255.0, 0.5);
-
-      mapper->SetBlendModeToComposite();
-      property->ShadeOff();
-      property->SetScalarOpacityUnitDistance(1.0);
-      break;
-    default:
-       vtkGenericWarningMacro("Unknown blend type.");
-       break;
-    }
-
-  // Set the default window size
-  renWin->SetSize(1000,1000);
-  renWin->Render();
-
-  // Add the volume to the scene
-  renderer->AddVolume( volume );
-
-  renderer->ResetCamera();
-
-  // interact with data
-  renWin->Render();
-
-  iplane->On();
-
-  iren->Start();
-
-
-  return 0;
-}
-*/

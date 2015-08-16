@@ -10,6 +10,18 @@ Windows (tested only on Windows)
 
 OpenGL (at least 2.1)
 
+FULL PATH USED:
+
+GLEWDIR:  {Path to GLEW}\glew-1.11.0
+
+MSVC: {Path to MSVC}\Microsoft Visual Studio 12.0\VC"
+
+QTDIR: {Path to Qt}\Qt32\5.5\msvc2013
+
+VTKDIR: {Path to VTK}\VTK-MSVC\bin"
+
+PATH: %MSVC%\bin;%QTDIR%\bin;%VTKDIR%;%GLEWDIR%;
+
 INSTALLATION:
 
 1.  Download and install Qt with QTDesigner
@@ -17,6 +29,8 @@ INSTALLATION:
 2.  Download and install VTK from http://www.vtk.org/download/ using CMake and Visual Studio 2013.
 
     2.1 Check the box VTK_Group_Qt to use Qt with VTK
+
+    2.2 Make sure to check the version (4 or 5) in the drop-down menu of Cmake.
 
     2.1.1 If you run into errors linking with Microsoft Devolpment Kit uncheck the DirectX directory in CMake.
 
