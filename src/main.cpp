@@ -304,7 +304,8 @@ int main(int argc, char *argv[])
       vtkSmartPointer<vtkRenderWindowInteractor> iren = vtkSmartPointer<vtkRenderWindowInteractor>::New();
       iren->SetRenderWindow(renWin);
       iren->SetDesiredUpdateRate(frameRate / (1+clip) );
-      iren->GetInteractorStyle()->SetDefaultRenderer(renderer);
+      vtkSmartPointer<vtkInteractorStyleTrackballCamera> style = vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
+      iren->SetInteractorStyle(style);
 
       // Read the data
       vtkSmartPointer<vtkAlgorithm> reader=0;
@@ -397,21 +398,28 @@ int main(int argc, char *argv[])
         box->GetSelectedFaceProperty()->SetOpacity(0.0);
         }
 
-      vtkSmartPointer<vtkImagePlaneWidget> iplane = vtkSmartPointer<vtkImagePlaneWidget>::New();
-      vtkSmartPointer<vtkProperty> ipwProp = vtkSmartPointer<vtkProperty>::New();
-      iplane->SetInteractor(iren);
-      iplane->SetInputConnection(reader->GetOutputPort());
+      vtkSmartPointer<vtkImagePlaneWidget> iplane[3];
+
+
         if(imageplane)
         {
+            for(int i = 0; i<3; i++){
+                iplane[i]=  vtkSmartPointer<vtkImagePlaneWidget>::New();
 
-          iplane->RestrictPlaneToVolumeOn();
+          iplane[i]->SetInteractor(iren);
+          iplane[i]->SetInputConnection(reader->GetOutputPort());
+          iplane[i]->RestrictPlaneToVolumeOn();
           double color[3] = {0,1,0};
-          iplane->GetPlaneProperty()->SetColor(color);
-          //double origin[3] ={0,1,0};
-          iplane->SetPlaneOrientation(1);
+          iplane[i]->GetPlaneProperty()->SetColor(color);
+          iplane[i]->SetPlaneOrientation(i);
+          iplane[i]->SetMarginSizeX(0);
+          iplane[i]->SetMarginSizeY(0);
+          iplane[i]->SetDefaultRenderer(renderer);
+          iplane[i]->UpdatePlacement();
 
-          iplane->SetDefaultRenderer(renderer);
-          iplane->UpdatePlacement();
+          iplane[i]->On();
+          }
+
         }
 
       if ( reductionFactor < 1.0 )
@@ -590,20 +598,16 @@ int main(int argc, char *argv[])
 
 
       renWin->AddRenderer(renderer);
-      renWin->SetInteractor(iren);
       uimw->qvtkwidget->SetRenderWindow(renWin);
 
-     // uimw->qvtkwidget->GetInteractor()->AddInteractor(iren);
+      //renderer->AddVolume( volume );
 
-      renderer->AddVolume( volume );
 
-      renderer->ResetCamera();
-
-      iplane->On();
-
-      mainWindow.show();
 
       renWin->Render();
+      mainWindow.show();
+
+
 
 
     return a.exec();
