@@ -25,6 +25,8 @@ add_executable(fiber
 src/main.cpp
 src/Rendering/QVTKWrapper.cpp
 src/Rendering/QVTKWrapper.h
+src/Rendering/ImagePlaneView.cpp
+src/Rendering/ImagePlaneView.h
 ${FORMS_HEADERS})
 
 

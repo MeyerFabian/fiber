@@ -40,11 +40,14 @@
 #include "vtkImagePlaneWidget.h"
 #include "vtkInteractorStyleUser.h"
 
+#include <QVTKWidget.h>
+#include "Rendering/QVTKWrapper.h"
+#include "Rendering/ImagePlaneView.h"
 
 #define VTI_FILETYPE 1
 #define MHA_FILETYPE 2
 #define NIFTI_FILETYPE 3
-
+/*
 // Callback for moving the planes from the box widget to the mapper
 
 class vtkBoxWidgetCallback : public vtkCommand
@@ -71,7 +74,7 @@ protected:
 
   vtkSmartPointer<vtkSmartVolumeMapper> Mapper;
 };
-
+*/
 void PrintUsage()
 {
   cout << "Usage: " << endl;
@@ -80,27 +83,20 @@ void PrintUsage()
   cout << endl;
   cout << "where options may include: " << endl;
   cout << endl;
-  cout << "  -DICOM <directory>" << endl;
-  cout << "  -VTI <filename>" << endl;
-  cout << "  -MHA <filename>" << endl;
+  cout << "  -NIFTI <filename>" << endl;
   cout << "  -DependentComponents" << endl;
-  cout << "  -Clip" << endl;
   cout << "  -MIP <window> <level>" << endl;
   cout << "  -CompositeRamp <window> <level>" << endl;
   cout << "  -CompositeShadeRamp <window> <level>" << endl;
-  cout << "  -CT_Skin" << endl;
-  cout << "  -CT_Bone" << endl;
-  cout << "  -CT_Muscle" << endl;
   cout << "  -FrameRate <rate>" << endl;
   cout << "  -DataReduction <factor>" << endl;
   cout << endl;
-  cout << "You must use either the -DICOM option to specify the directory where" << endl;
-  cout << "the data is located or the -VTI or -MHA option to specify the path of a .vti file." << endl;
+  cout << "the data is located or the -NIFTI option to specify the path of a .nii or .nii.gz file." << endl;
   cout << endl;
   cout << "By default, the program assumes that the file has independent components," << endl;
   cout << "use -DependentComponents to specify that the file has dependent components." << endl;
   cout << endl;
-  cout << "Use the -Clip option to display a cube widget for clipping the volume." << endl;
+  cout << "Use the -Imageplane option to display an ImagePlaneView of the volume." << endl;
   cout << "Use the -FrameRate option with a desired frame rate (in frames per second)" << endl;
   cout << "which will control the interactive rendering rate." << endl;
   cout << "Use the -DataReduction option with a reduction factor (greater than zero and" << endl;
@@ -111,32 +107,18 @@ void PrintUsage()
   cout << "-CompositeRamp option is unshaded compositing, while the other" << endl;
   cout << "compositing options employ shading." << endl;
   cout << endl;
-  cout << "Note: MIP, CompositeRamp, CompositeShadeRamp, CT_Skin, CT_Bone," << endl;
-  cout << "and CT_Muscle are appropriate for DICOM data. MIP, CompositeRamp," << endl;
+  cout << "Note: MIP, CompositeRamp, CompositeShadeRamp" << endl;
+  cout << "MIP, CompositeRamp," << endl;
   cout << "and RGB_Composite are appropriate for RGB data." << endl;
   cout << endl;
-  cout << "Example: fiber -NIFTI datasets/tensors.nii.gz -MIP 4096 1024" << endl;
+  cout << "Example: fiber -NIFTI datasets/dti30/dti30.nii -MIP 4096 1024" << endl;
   cout << endl;
   int i = 0;
   cin >> i;
 }
 
 
-#include <vtkAutoInit.h>
-VTK_MODULE_INIT(vtkRenderingOpenGL)
-VTK_MODULE_INIT(vtkInteractionStyle)
 
-#include <vtkSmartPointer.h>
-#include <vtkSphereSource.h>
-#include <vtkPolyDataMapper.h>
-#include <vtkActor.h>
-#include <vtkImageViewer.h>
-#include <vtkRenderWindowInteractor.h>
-#include <vtkInteractorStyleImage.h>
-#include <vtkRenderer.h>
-#include <vtkJPEGReader.h>
-#include <QVTKWidget.h>
-#include <vtkProperty.h>
 
 int main(int argc, char *argv[])
 {
@@ -146,6 +128,8 @@ int main(int argc, char *argv[])
       Ui::MainWindow* uimw = new Ui::MainWindow();
       uimw->setupUi(&mainWindow);
 
+      QVTKWrapper* window1 = new QVTKWrapper(uimw->qvtkwidget);
+      ImagePlaneView* view1=NULL;
       // Parse the parameters
 
       int count = 1;
@@ -169,19 +153,7 @@ int main(int argc, char *argv[])
           PrintUsage();
           exit(EXIT_SUCCESS);
           }
-        else if ( !strcmp( argv[count], "-DICOM" ) )
-          {
-          dirname = new char[strlen(argv[count+1])+1];
-          sprintf( dirname, "%s", argv[count+1] );
-          count += 2;
-          }
-        else if ( !strcmp( argv[count], "-VTI" ) )
-          {
-          fileName = new char[strlen(argv[count+1])+1];
-          fileType = VTI_FILETYPE;
-          sprintf( fileName, "%s", argv[count+1] );
-          count += 2;
-          }
+
           else if ( !strcmp( argv[count], "-NIFTI" ) )
             {
             fileName = new char[strlen(argv[count+1])+1];
@@ -189,13 +161,6 @@ int main(int argc, char *argv[])
             sprintf( fileName, "%s", argv[count+1] );
             count += 2;
             }
-        else if ( !strcmp( argv[count], "-MHA" ) )
-          {
-          fileName = new char[strlen(argv[count+1])+1];
-          fileType = MHA_FILETYPE;
-          sprintf( fileName, "%s", argv[count+1] );
-          count += 2;
-          }
         else if ( !strcmp( argv[count], "-Clip") )
           {
           clip = 1;
@@ -226,21 +191,6 @@ int main(int argc, char *argv[])
           opacityLevel  = atof( argv[count+2] );
           blendType = 2;
           count += 3;
-          }
-        else if ( !strcmp( argv[count], "-CT_Skin" ) )
-          {
-          blendType = 3;
-          count += 1;
-          }
-        else if ( !strcmp( argv[count], "-CT_Bone" ) )
-          {
-          blendType = 4;
-          count += 1;
-          }
-        else if ( !strcmp( argv[count], "-CT_Muscle" ) )
-          {
-          blendType = 5;
-          count += 1;
           }
         else if ( !strcmp( argv[count], "-RGB_Composite" ) )
           {
@@ -291,59 +241,19 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
         }
 
-      // Create the renderer, render window and interactor
-      vtkSmartPointer<vtkRenderer> renderer = vtkSmartPointer<vtkRenderer>::New();
-      vtkSmartPointer<vtkRenderWindow> renWin = vtkSmartPointer<vtkRenderWindow>::New();
-      renWin->AddRenderer(renderer);
-
-      // Connect it all. Note that funny arithematic on the
-      // SetDesiredUpdateRate - the vtkRenderWindow divides it
-      // allocated time across all renderers, and the renderer
-      // divides it time across all props. If clip is
-      // true then there are two props
-      vtkSmartPointer<vtkRenderWindowInteractor> iren = vtkSmartPointer<vtkRenderWindowInteractor>::New();
-      iren->SetRenderWindow(renWin);
-      iren->SetDesiredUpdateRate(frameRate / (1+clip) );
-      vtkSmartPointer<vtkInteractorStyleTrackballCamera> style = vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
-      iren->SetInteractorStyle(style);
-
       // Read the data
       vtkSmartPointer<vtkAlgorithm> reader=0;
       vtkSmartPointer<vtkImageData> input=0;
-      if(dirname)
-        {
-        vtkSmartPointer<vtkDICOMImageReader> dicomReader = vtkSmartPointer<vtkDICOMImageReader>::New();
-        dicomReader->SetDirectoryName(dirname);
-        dicomReader->Update();
-        input=dicomReader->GetOutput();
-        reader=dicomReader;
-        }
-        else if ( fileType == NIFTI_FILETYPE ){
+      if ( fileType == NIFTI_FILETYPE ){
           vtkSmartPointer<vtkNIFTIImageReader> niftreader = vtkSmartPointer<vtkNIFTIImageReader>::New();
           niftreader->SetFileName(fileName);
           niftreader->Update();
           input=niftreader->GetOutput();
           reader=niftreader;
         }
-      else if ( fileType == VTI_FILETYPE )
-        {
-        vtkSmartPointer<vtkXMLImageDataReader> xmlReader = vtkSmartPointer<vtkXMLImageDataReader>::New();
-        xmlReader->SetFileName(fileName);
-        xmlReader->Update();
-        input=xmlReader->GetOutput();
-        reader=xmlReader;
-        }
-      else if ( fileType == MHA_FILETYPE )
-        {
-        vtkSmartPointer<vtkMetaImageReader> metaReader = vtkSmartPointer<vtkMetaImageReader>::New();
-        metaReader->SetFileName(fileName);
-        metaReader->Update();
-        input=metaReader->GetOutput();
-        reader=metaReader;
-        }
       else
         {
-        cout << "Error! Not VTI or MHA!" << endl;
+        cout << "Error! Not NII!" << endl;
         exit(EXIT_FAILURE);
         }
 
@@ -370,13 +280,16 @@ int main(int argc, char *argv[])
       // Create our volume and mapper
       vtkSmartPointer<vtkVolume> volume = vtkSmartPointer<vtkVolume>::New();
       vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
+/*
+
+    If we need this code we can comment it in again, volume needs to be rendered for this option though.
 
       // Add a box widget if the clip option was selected
      vtkSmartPointer<vtkBoxWidget> box = vtkSmartPointer<vtkBoxWidget>::New();
 
       if (clip)
         {
-        box->SetInteractor(iren);
+        box->SetInteractor(window1->GetInteractor());
         box->SetPlaceFactor(1.01);
         if ( reductionFactor < 1.0 )
           {
@@ -387,7 +300,7 @@ int main(int argc, char *argv[])
           box->SetInputData(input);
           }
 
-        box->SetDefaultRenderer(renderer);
+        box->SetDefaultRenderer(window1->GetRenderer());
         box->InsideOutOn();
         box->PlaceWidget();
         vtkBoxWidgetCallback *callback = vtkBoxWidgetCallback::New();
@@ -397,28 +310,15 @@ int main(int argc, char *argv[])
         box->EnabledOn();
         box->GetSelectedFaceProperty()->SetOpacity(0.0);
         }
-
-      vtkSmartPointer<vtkImagePlaneWidget> iplane[3];
+*/
 
 
         if(imageplane)
         {
-            for(int i = 0; i<3; i++){
-                iplane[i]=  vtkSmartPointer<vtkImagePlaneWidget>::New();
 
-          iplane[i]->SetInteractor(iren);
-          iplane[i]->SetInputConnection(reader->GetOutputPort());
-          iplane[i]->RestrictPlaneToVolumeOn();
-          double color[3] = {0,1,0};
-          iplane[i]->GetPlaneProperty()->SetColor(color);
-          iplane[i]->SetPlaneOrientation(i);
-          iplane[i]->SetMarginSizeX(0);
-          iplane[i]->SetMarginSizeY(0);
-          iplane[i]->SetDefaultRenderer(renderer);
-          iplane[i]->UpdatePlacement();
+            //may be restructured into QVTKWrapper for better integrity and less errors
+            view1 = new ImagePlaneView(window1->GetRenderer(),window1->GetInteractor(),reader->GetOutputPort());
 
-          iplane[i]->On();
-          }
 
         }
 
@@ -499,76 +399,6 @@ int main(int argc, char *argv[])
           property->ShadeOn();
           break;
 
-        // CT_Skin
-        // Use compositing and functions set to highlight skin in CT data
-        // Not for use on RGB data
-        case 3:
-          colorFun->AddRGBPoint( -3024, 0, 0, 0, 0.5, 0.0 );
-          colorFun->AddRGBPoint( -1000, .62, .36, .18, 0.5, 0.0 );
-          colorFun->AddRGBPoint( -500, .88, .60, .29, 0.33, 0.45 );
-          colorFun->AddRGBPoint( 3071, .83, .66, 1, 0.5, 0.0 );
-
-          opacityFun->AddPoint(-3024, 0, 0.5, 0.0 );
-          opacityFun->AddPoint(-1000, 0, 0.5, 0.0 );
-          opacityFun->AddPoint(-500, 1.0, 0.33, 0.45 );
-          opacityFun->AddPoint(3071, 1.0, 0.5, 0.0);
-
-          mapper->SetBlendModeToComposite();
-          property->ShadeOn();
-          property->SetAmbient(0.1);
-          property->SetDiffuse(0.9);
-          property->SetSpecular(0.2);
-          property->SetSpecularPower(10.0);
-          property->SetScalarOpacityUnitDistance(0.8919);
-          break;
-
-        // CT_Bone
-        // Use compositing and functions set to highlight bone in CT data
-        // Not for use on RGB data
-        case 4:
-          colorFun->AddRGBPoint( -3024, 0, 0, 0, 0.5, 0.0 );
-          colorFun->AddRGBPoint( -16, 0.73, 0.25, 0.30, 0.49, .61 );
-          colorFun->AddRGBPoint( 641, .90, .82, .56, .5, 0.0 );
-          colorFun->AddRGBPoint( 3071, 1, 1, 1, .5, 0.0 );
-
-          opacityFun->AddPoint(-3024, 0, 0.5, 0.0 );
-          opacityFun->AddPoint(-16, 0, .49, .61 );
-          opacityFun->AddPoint(641, .72, .5, 0.0 );
-          opacityFun->AddPoint(3071, .71, 0.5, 0.0);
-
-          mapper->SetBlendModeToComposite();
-          property->ShadeOn();
-          property->SetAmbient(0.1);
-          property->SetDiffuse(0.9);
-          property->SetSpecular(0.2);
-          property->SetSpecularPower(10.0);
-          property->SetScalarOpacityUnitDistance(0.8919);
-          break;
-
-        // CT_Muscle
-        // Use compositing and functions set to highlight muscle in CT data
-        // Not for use on RGB data
-        case 5:
-          colorFun->AddRGBPoint( -3024, 0, 0, 0, 0.5, 0.0 );
-          colorFun->AddRGBPoint( -155, .55, .25, .15, 0.5, .92 );
-          colorFun->AddRGBPoint( 217, .88, .60, .29, 0.33, 0.45 );
-          colorFun->AddRGBPoint( 420, 1, .94, .95, 0.5, 0.0 );
-          colorFun->AddRGBPoint( 3071, .83, .66, 1, 0.5, 0.0 );
-
-          opacityFun->AddPoint(-3024, 0, 0.5, 0.0 );
-          opacityFun->AddPoint(-155, 0, 0.5, 0.92 );
-          opacityFun->AddPoint(217, .68, 0.33, 0.45 );
-          opacityFun->AddPoint(420,.83, 0.5, 0.0);
-          opacityFun->AddPoint(3071, .80, 0.5, 0.0);
-
-          mapper->SetBlendModeToComposite();
-          property->ShadeOn();
-          property->SetAmbient(0.1);
-          property->SetDiffuse(0.9);
-          property->SetSpecular(0.2);
-          property->SetSpecularPower(10.0);
-          property->SetScalarOpacityUnitDistance(0.8919);
-          break;
 
         // RGB_Composite
         // Use compositing and functions set to highlight red/green/blue regions
@@ -595,20 +425,13 @@ int main(int argc, char *argv[])
            vtkGenericWarningMacro("Unknown blend type.");
            break;
         }
+      window1->render();
 
-
-      renWin->AddRenderer(renderer);
-      uimw->qvtkwidget->SetRenderWindow(renWin);
-
-      //renderer->AddVolume( volume );
-
-
-
-      renWin->Render();
       mainWindow.show();
 
-
-
+     delete uimw;
+     delete window1;
+     delete view1;
 
     return a.exec();
 }
