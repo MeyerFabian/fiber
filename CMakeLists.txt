@@ -23,6 +23,8 @@ QT5_WRAP_UI(FORMS_HEADERS ${FORMS})
 
 add_executable(fiber
 src/main.cpp
+src/Rendering/QVTKWrapper.cpp
+src/Rendering/QVTKWrapper.h
 ${FORMS_HEADERS})
 
 

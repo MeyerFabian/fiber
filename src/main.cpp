@@ -1,6 +1,6 @@
 
 #include <QMainWindow>
-#include "ui_mainwindow.h"
+#include "GUI/ui_mainwindow.h"
 /*=========================================================================
 
   Program:   Visualization Toolkit
