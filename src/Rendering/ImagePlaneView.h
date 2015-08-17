@@ -6,11 +6,12 @@
 #include "vtkImagePlaneWidget.h"
 #include "vtkProperty.h"
 #include "vtkRenderWindowInteractor.h"
+#include "view.h"
 
-class ImagePlaneView
+class ImagePlaneView : public View
 {
 public:
-    ImagePlaneView(vtkSmartPointer<vtkRenderer> renderer,vtkSmartPointer<vtkRenderWindowInteractor> rend, vtkSmartPointer<vtkAlgorithmOutput> alg);
+    ImagePlaneView(vtkSmartPointer<vtkAlgorithmOutput> alg);
     ~ImagePlaneView();
     /*
     vtkSmartPointer<vtkRenderWindowInteractor> GetRenderWindowInteractor();
@@ -20,6 +21,8 @@ public:
 
 protected:
     vtkSmartPointer<vtkImagePlaneWidget> iplane[3];
+    const int length = 3;
+    void setActive(vtkSmartPointer<vtkRenderer> renderer, vtkSmartPointer<vtkRenderWindowInteractor> rendint);
     /*
     vtkSmartPointer<vtkRenderWindowInteractor> rwi;
     vtkSmartPointer<vtkAlgorithmOutput> ao;

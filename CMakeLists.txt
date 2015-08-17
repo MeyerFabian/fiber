@@ -27,6 +27,8 @@ src/Rendering/QVTKWrapper.cpp
 src/Rendering/QVTKWrapper.h
 src/Rendering/ImagePlaneView.cpp
 src/Rendering/ImagePlaneView.h
+src/Rendering/View.h
+src/Rendering/View.cpp
 ${FORMS_HEADERS})
 
 

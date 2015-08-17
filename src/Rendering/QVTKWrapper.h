@@ -6,7 +6,7 @@
 #include "vtkInteractorStyle.h"
 #include "QVTKWidget.h"
 #include "vtkInteractorStyleTrackballCamera.h"
-
+#include "View.h"
 class QVTKWrapper
 {
 public:
@@ -18,12 +18,15 @@ public:
     vtkSmartPointer<vtkInteractorStyle> GetInteractorStyle();
     QVTKWidget* GetQVTKWidget();
     void render();
+    View* getView();
+    void setView(View* view);
 protected:
     vtkSmartPointer<vtkRenderer> renderer;
     vtkSmartPointer<vtkRenderWindow> renWin;
     vtkSmartPointer<vtkRenderWindowInteractor> iren;
     vtkSmartPointer<vtkInteractorStyle> istyle;
     QVTKWidget* qvtkwidget;
+    View* view;
 
 };
 

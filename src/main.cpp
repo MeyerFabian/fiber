@@ -129,7 +129,6 @@ int main(int argc, char *argv[])
       uimw->setupUi(&mainWindow);
 
       QVTKWrapper* window1 = new QVTKWrapper(uimw->qvtkwidget);
-      ImagePlaneView* view1=NULL;
       // Parse the parameters
 
       int count = 1;
@@ -312,12 +311,12 @@ int main(int argc, char *argv[])
         }
 */
 
-
+        ImagePlaneView* view1;
         if(imageplane)
         {
 
-            //may be restructured into QVTKWrapper for better integrity and less errors
-            view1 = new ImagePlaneView(window1->GetRenderer(),window1->GetInteractor(),reader->GetOutputPort());
+            view1 =  new ImagePlaneView(reader->GetOutputPort());
+            window1->setView(view1);
 
 
         }
