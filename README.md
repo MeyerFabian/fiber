@@ -32,7 +32,7 @@ INSTALLATION:
 
     2.2 Make sure to check the version (4 or 5) in the drop-down menu of Cmake.
 
-    2.1.1 If you run into errors linking with Microsoft Devolpment Kit uncheck the DirectX directory in CMake.
+    2.1.1 If you run into errors linking with Microsoft Development Kit uncheck the DirectX directory in CMake.
 
 3.  Clone this repository and build it using cmake and your compiler of choice and link it with VTK.
 
@@ -40,7 +40,7 @@ INSTALLATION:
 
 5.  Download or use your own (converted) NIFTI-Images and put them somewhere in the bin folder, where you will find them (e.g. bin/datasets/dti30/dti30.nii)
 
-6.  Run fiber.exe from command line with the dataset: "fiber -NII datasets/dti30/dti30.nii"
+6.  Run fiber.exe from command line with the dataset: "fiber -NIFTI datasets/dti30/dti30.nii -Imageplane"
 
 
 INPUT DATA:
@@ -51,8 +51,5 @@ INPUT DATA:
 Links for development:
 
 Will probably feature QT for GUI, examples can be found here: http://www.vtk.org/Wiki/VTK/Examples/Cxx#Qt
-
-3 Plane Slicing example, as its done in a lot of fiber tracking examples to have some anatomy reference in addition to the fibers:
-http://www.vtk.org/gitweb?p=VTK.git;a=blob;f=Examples/GUI/Qt/FourPaneViewer/QtVTKRenderWindows.cxx;h=3e94b312d5a5d9b3bfaacdc1f0142df09086326c;hb=HEAD
 
 B-Spline Generation to create fibers from points using VTK: http://www.vtkjournal.org/browse/publication/790
