@@ -26,7 +26,7 @@ protected:
     vtkSmartPointer<vtkRenderWindowInteractor> iren;
     vtkSmartPointer<vtkInteractorStyle> istyle;
     QVTKWidget* qvtkwidget;
-    View* view;
+    View* view = NULL;
 
 };
 

@@ -141,7 +141,7 @@ int main(int argc, char *argv[])
       double frameRate = 10.0;
       char *fileName=0;
       int fileType=0;
-      int imageplane=1;
+      int imageplane=0;
 
       bool independentComponents=true;
 
@@ -311,11 +311,10 @@ int main(int argc, char *argv[])
         }
 */
 
-        ImagePlaneView* view1;
+        ImagePlaneView* view1 =NULL;
         if(imageplane)
         {
-
-            view1 =  new ImagePlaneView(reader->GetOutputPort());
+        view1 =new ImagePlaneView(reader->GetOutputPort());
             window1->setView(view1);
 
 

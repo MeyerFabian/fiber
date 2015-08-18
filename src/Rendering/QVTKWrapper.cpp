@@ -35,7 +35,9 @@ QVTKWidget* QVTKWrapper::GetQVTKWidget(){
     return this->qvtkwidget;
 }
 void QVTKWrapper::render(){
+    if(view != NULL){
     view->setActive(this->renderer,this->iren);
+    }
     renWin->AddRenderer(renderer);
     qvtkwidget->SetRenderWindow(renWin);
 
