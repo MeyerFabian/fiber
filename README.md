@@ -47,6 +47,9 @@ INPUT DATA:
 
 .nii (NIFTI-Images), NIFTI is an extension of the DICOM-format to support DTI-Imaging.
 
+EXAMPLE DATASETS:
+
+http://scil.dinf.usherbrooke.ca/?page_id=822
 
 Links for development:
 
