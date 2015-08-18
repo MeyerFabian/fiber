@@ -141,7 +141,7 @@ int main(int argc, char *argv[])
       double frameRate = 10.0;
       char *fileName=0;
       int fileType=0;
-      int imageplane=0;
+      int imageplane=1;
 
       bool independentComponents=true;
 
