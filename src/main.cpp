@@ -255,9 +255,41 @@ int main(int argc, char *argv[])
       vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
 
 
+	  ///////////#Valle
+
+	  //vtkSmartPointer<vtkStructuredGrid> grid = vtkSmartPointer<vtkStructuredGrid>::New();
+
+	  std::cout << "Dims: " << " x: " << dim[0] << " y: " << dim[1] << " z: " << dim[2] << std::endl;
+	  std::cout << "Number of points: " << input->GetNumberOfPoints() << std::endl;
+	  std::cout << "Number of cells: " << input->GetNumberOfCells() << std::endl;
+
+	  for (int z = 0; z < dim[2]; z++)
+	  {
+		  for (int y = 0; y < dim[1]; y++)
+		  {
+			  for (int x = 0; x < dim[0]; x++)
+			  {
+				  int ijk[3];
+				  ijk[0] = x;
+				  ijk[1] = y;
+				  ijk[2] = z;
+				  vtkIdType currentCellId = input->ComputeCellId(ijk);
+
+				  //vtkSmartPointer<vtkCell> currentCell = vtkSmartPointer<vtkCell>::New();
+				  //currentCell = input->GetCell(currentCellId);
+
+				  double cellVector[3];
+				  input->GetPoint(currentCellId, cellVector);
+				  //std::cout << cellVector[0] << cellVector[1] << cellVector[2] << std::endl;
+			  }
+		  }
+	  }
+
+	  ///////////#Valle
+
+
+
       View* view1 =NULL;
-
-
 
       // Add a box widget if the clip option was selected
 
