@@ -43,38 +43,12 @@
 #include <QVTKWidget.h>
 #include "Rendering/QVTKWrapper.h"
 #include "Rendering/ImagePlaneView.h"
+#include "Rendering/BoxView.h"
 
 #define VTI_FILETYPE 1
 #define MHA_FILETYPE 2
 #define NIFTI_FILETYPE 3
-/*
-// Callback for moving the planes from the box widget to the mapper
 
-class vtkBoxWidgetCallback : public vtkCommand
-{
-public:
-  static vtkBoxWidgetCallback *New()
-    { return new vtkBoxWidgetCallback; }
-  virtual void Execute(vtkObject* caller, unsigned long, void*)
-    {
-      vtkSmartPointer<vtkBoxWidget> widget = reinterpret_cast<vtkBoxWidget * >(caller);
-      if (this->Mapper)
-        {
-        vtkSmartPointer<vtkPlanes> planes = vtkSmartPointer<vtkPlanes>::New();
-        widget->GetPlanes(planes);
-        this->Mapper->SetClippingPlanes(planes);
-        }
-    }
-  void SetMapper(vtkSmartPointer<vtkSmartVolumeMapper> m)
-    { this->Mapper = m; }
-
-protected:
-  vtkBoxWidgetCallback()
-    { this->Mapper = 0; }
-
-  vtkSmartPointer<vtkSmartVolumeMapper> Mapper;
-};
-*/
 void PrintUsage()
 {
   cout << "Usage: " << endl;
@@ -279,39 +253,29 @@ int main(int argc, char *argv[])
       // Create our volume and mapper
       vtkSmartPointer<vtkVolume> volume = vtkSmartPointer<vtkVolume>::New();
       vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
-/*
 
-    If we need this code we can comment it in again, volume needs to be rendered for this option though.
+
+      View* view1 =NULL;
+
+
 
       // Add a box widget if the clip option was selected
-     vtkSmartPointer<vtkBoxWidget> box = vtkSmartPointer<vtkBoxWidget>::New();
+
 
       if (clip)
         {
-        box->SetInteractor(window1->GetInteractor());
-        box->SetPlaceFactor(1.01);
-        if ( reductionFactor < 1.0 )
-          {
-          box->SetInputConnection(resample->GetOutputPort());
-          }
-        else
-          {
-          box->SetInputData(input);
-          }
-
-        box->SetDefaultRenderer(window1->GetRenderer());
-        box->InsideOutOn();
-        box->PlaceWidget();
-        vtkBoxWidgetCallback *callback = vtkBoxWidgetCallback::New();
-        callback->SetMapper(mapper);
-        box->AddObserver(vtkCommand::InteractionEvent, callback);
-        callback->Delete();
-        box->EnabledOn();
-        box->GetSelectedFaceProperty()->SetOpacity(0.0);
+          if ( reductionFactor < 1.0 )
+            {
+              view1 =new BoxView(resample->GetOutputPort(),mapper,volume);
+            }
+          else
+            {
+              view1 =new BoxView(reader->GetOutputPort(),mapper,volume);
+            }
+              window1->setView(view1);
         }
-*/
 
-        ImagePlaneView* view1 =NULL;
+    // Add a Imageplane widget if the imageplane option was selected
         if(imageplane)
         {
         view1 =new ImagePlaneView(reader->GetOutputPort());
@@ -424,7 +388,6 @@ int main(int argc, char *argv[])
            break;
         }
       window1->render();
-
       mainWindow.show();
 
      delete uimw;
