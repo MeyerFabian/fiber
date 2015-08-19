@@ -44,6 +44,8 @@
 #include "Rendering/QVTKWrapper.h"
 #include "Rendering/ImagePlaneView.h"
 
+#include <vtkStructuredGrid.h>
+
 #define VTI_FILETYPE 1
 #define MHA_FILETYPE 2
 #define NIFTI_FILETYPE 3
@@ -279,7 +281,40 @@ int main(int argc, char *argv[])
       // Create our volume and mapper
       vtkSmartPointer<vtkVolume> volume = vtkSmartPointer<vtkVolume>::New();
       vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
-/*
+
+	  ///////////#Valle
+
+	  //vtkSmartPointer<vtkStructuredGrid> grid = vtkSmartPointer<vtkStructuredGrid>::New();
+
+	  std::cout << "Dims: " << " x: " << dim[0] << " y: " << dim[1] << " z: " << dim[2] << std::endl;
+	  std::cout << "Number of points: " << input->GetNumberOfPoints() << std::endl;
+	  std::cout << "Number of cells: " << input->GetNumberOfCells() << std::endl;
+
+	  for (int z = 0; z < dim[2]; z++)
+	  {
+		  for (int y = 0; y < dim[1]; y++)
+		  {
+			  for (int x = 0; x < dim[0]; x++)
+			  {
+				  int ijk[3];
+				  ijk[0] = x;
+				  ijk[1] = y;
+				  ijk[2] = z;
+				  vtkIdType currentCellId = input->ComputeCellId(ijk);
+
+				  //vtkSmartPointer<vtkCell> currentCell = vtkSmartPointer<vtkCell>::New();
+				  //currentCell = input->GetCell(currentCellId);
+
+				  double cellVector[3];
+				  input->GetPoint(currentCellId, cellVector);
+				  //std::cout << cellVector[0] << cellVector[1] << cellVector[2] << std::endl;
+			  }
+		  }
+	  }
+
+	  ///////////#Valle
+
+	  /*
 
     If we need this code we can comment it in again, volume needs to be rendered for this option though.
 
