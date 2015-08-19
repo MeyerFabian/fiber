@@ -29,6 +29,8 @@ src/Rendering/ImagePlaneView.cpp
 src/Rendering/ImagePlaneView.h
 src/Rendering/View.h
 src/Rendering/View.cpp
+src/Rendering/BoxView.cpp
+src/Rendering/BoxView.h
 ${FORMS_HEADERS})
 
 
