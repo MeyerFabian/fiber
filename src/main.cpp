@@ -280,7 +280,10 @@ int main(int argc, char *argv[])
 
 				  double cellVector[3];
 				  input->GetPoint(currentCellId, cellVector);
-				  //std::cout << cellVector[0] << cellVector[1] << cellVector[2] << std::endl;
+				  vtkSmartPointer<vtkPointData> pointData = vtkSmartPointer<vtkPointData>::New();
+				  pointData = input->GetPointData();
+				  std::cout << cellVector[0] << cellVector[1] << cellVector[2] << std::endl;
+				  std::cout << "----------  New Data" << std::endl;
 			  }
 		  }
 	  }
