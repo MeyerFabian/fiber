@@ -39,6 +39,9 @@
 #include "vtkSmartPointer.h"
 #include "vtkImagePlaneWidget.h"
 #include "vtkInteractorStyleUser.h"
+#include "vtkPointData.h"
+#include "vtkDoubleArray.h"
+#include "vtkCellData.h"
 
 #include <QVTKWidget.h>
 #include "Rendering/QVTKWrapper.h"
@@ -221,7 +224,10 @@ int main(int argc, char *argv[])
           vtkSmartPointer<vtkNIFTIImageReader> niftreader = vtkSmartPointer<vtkNIFTIImageReader>::New();
           niftreader->SetFileName(fileName);
           niftreader->Update();
+
+		  std::cout << "File dimension: " << niftreader->GetFileDimensionality() << std::endl;
           input=niftreader->GetOutput();
+
           reader=niftreader;
         }
       else
@@ -229,10 +235,93 @@ int main(int argc, char *argv[])
         cout << "Error! Not NII!" << endl;
         exit(EXIT_FAILURE);
         }
+	  int dim[3];
+	  input->GetDimensions(dim);
+
+	  std::cout << "Dims: " << " x: " << dim[0] << " y: " << dim[1] << " z: " << dim[2] << std::endl;
+	  std::cout << "Number of points: " << input->GetNumberOfPoints() << std::endl;
+	  std::cout << "Number of cells: " << input->GetNumberOfCells() << std::endl;
+
+	  
+      std::cout << "Data dimension: " << input->GetDataDimension()<<std::endl;
+	  
+	  vtkFieldData* fielddata = input->GetFieldData();
+	  int fc = fielddata->GetNumberOfComponents();
+	  std::cout << "Number of Components(fielddata): " << fc << endl;
+	  int ft = fielddata->GetNumberOfTuples();
+	  std::cout << "Number of Tuples(fielddata): " << ft << endl;
+
+	  vtkPointData* pointdata = input->GetPointData();
+	  int pc = pointdata->GetNumberOfComponents();
+	  std::cout << "Number of Components(pointdata): " << pc << endl;
+	  int pt = pointdata->GetNumberOfTuples();
+	  std::cout << "Number of Tuples(pointdata): " << pt << endl;
+
+	  vtkDataArray* dataarray = pointdata->GetArray(0);
+	  int dc = dataarray->GetNumberOfComponents();
+	  std::cout << "Number of Components(dataarray): " << dc << endl;
+	  int dt = dataarray->GetNumberOfTuples();
+	  std::cout << "Number of Tuples(dataarray): " << dt << endl;
+
+	  vtkCellData* celldata = input->GetCellData();
+	  int cc = celldata->GetNumberOfComponents();
+	  std::cout << "Number of Components(dataarray): " << cc << endl;
+	  int ct = celldata->GetNumberOfTuples();
+	  std::cout << "Number of Tuples(dataarray): " << ct << endl;
+
+	  for (int z = 0; z < dim[2]; z++)
+	  {
+		  for (int y = 0; y < dim[1]; y++)
+		  {
+			  for (int x = 0; x < dim[0]; x++)
+			  {
+				  int ijk[3];
+				  ijk[0] = x;
+				  ijk[1] = y;
+				  ijk[2] = z;
+				  vtkIdType pointId = input->ComputePointId(ijk);
+
+				  double* tensor = dataarray->GetTuple(pointId);
+				  cout << *(tensor)<<endl;
+				  //vtkSmartPointer<vtkCell> currentCell = vtkSmartPointer<vtkCell>::New();
+				  //currentCell = input->GetCell(currentCellId);
+
+			  }
+		  }
+      }
+	  //vtkDoubleArray* tensors = reinterpret_cast<vtkDoubleArray *>( pointdata->GetNumberOfArrays());
+	  //vtkIdType idtype = tensors->GetNumberOfComponents();
+	  //std::cout << idtype;
+	  //std::cout << tensors->GetNumberOfTuples();
+      /*
+	  for (int z = 0; z < dim[2]; z++)
+	  {
+		  for (int y = 0; y < dim[1]; y++)
+		  {
+			  for (int x = 0; x < dim[0]; x++)
+			  {
+				  int ijk[3];
+				  ijk[0] = x;
+				  ijk[1] = y;
+				  ijk[2] = z;
+				  vtkIdType currentCellId = input->ComputeCellId(ijk);
+
+				  //vtkSmartPointer<vtkCell> currentCell = vtkSmartPointer<vtkCell>::New();
+
+
+				  double cellVector[4];
+
+				  input->GetPoint(currentCellId, cellVector);
+				  std::cout << cellVector[3] << endl;// << cellVector[1] << cellVector[2] << std::endl;
+			  }
+		  }
+	  }
+      */
+	  ///////////#Valle
+
 
       // Verify that we actually have a volume
-      int dim[3];
-      input->GetDimensions(dim);
+
       if ( dim[0] < 2 ||
            dim[1] < 2 ||
            dim[2] < 2 )
@@ -259,6 +348,7 @@ int main(int argc, char *argv[])
 
 	  //vtkSmartPointer<vtkStructuredGrid> grid = vtkSmartPointer<vtkStructuredGrid>::New();
 
+<<<<<<< .merge_file_a08504
 	  std::cout << "Dims: " << " x: " << dim[0] << " y: " << dim[1] << " z: " << dim[2] << std::endl;
 	  std::cout << "Number of points: " << input->GetNumberOfPoints() << std::endl;
 	  std::cout << "Number of cells: " << input->GetNumberOfCells() << std::endl;
@@ -290,6 +380,8 @@ int main(int argc, char *argv[])
 
 	  ///////////#Valle
 
+=======
+>>>>>>> .merge_file_a02312
 
 
       View* view1 =NULL;
