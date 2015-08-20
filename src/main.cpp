@@ -42,6 +42,7 @@
 #include "vtkPointData.h"
 #include "vtkDoubleArray.h"
 #include "vtkCellData.h"
+#include "vtkImageExtractComponents.h"
 
 #include <QVTKWidget.h>
 #include "Rendering/QVTKWrapper.h"
@@ -241,8 +242,6 @@ int main(int argc, char *argv[])
 	  std::cout << "Dims: " << " x: " << dim[0] << " y: " << dim[1] << " z: " << dim[2] << std::endl;
 	  std::cout << "Number of points: " << input->GetNumberOfPoints() << std::endl;
 	  std::cout << "Number of cells: " << input->GetNumberOfCells() << std::endl;
-
-	  
       std::cout << "Data dimension: " << input->GetDataDimension()<<std::endl;
 	  
 	  vtkFieldData* fielddata = input->GetFieldData();
@@ -269,6 +268,22 @@ int main(int argc, char *argv[])
 	  int ct = celldata->GetNumberOfTuples();
 	  std::cout << "Number of Tuples(dataarray): " << ct << endl;
 
+	  //Extract Tensor Data
+	  vtkSmartPointer<vtkImageExtractComponents> extractTupel1 = vtkSmartPointer<vtkImageExtractComponents>::New();
+	  extractTupel1->SetInputConnection(reader->GetOutputPort());
+	  extractTupel1->SetComponents(0,1,2);
+	  extractTupel1->Update();
+
+	  vtkSmartPointer<vtkImageExtractComponents> extractTupel2 = vtkSmartPointer<vtkImageExtractComponents>::New();
+	  extractTupel2->SetInputConnection(reader->GetOutputPort());
+	  extractTupel2->SetComponents(3, 4, 5);
+	  extractTupel2->Update();
+
+	  vtkSmartPointer<vtkImageExtractComponents> extractTupel3 = vtkSmartPointer<vtkImageExtractComponents>::New();
+	  extractTupel3->SetInputConnection(reader->GetOutputPort());
+	  extractTupel3->SetComponents(6, 7, 8);
+	  extractTupel3->Update();
+
 	  for (int z = 0; z < dim[2]; z++)
 	  {
 		  for (int y = 0; y < dim[1]; y++)
@@ -281,19 +296,34 @@ int main(int argc, char *argv[])
 				  ijk[2] = z;
 				  vtkIdType pointId = input->ComputePointId(ijk);
 
-				  double* tensor = dataarray->GetTuple(pointId);
-				  cout << *(tensor)<<endl;
+				  double tupel1[3];
+				  double tupel2[3];
+				  double tupel3[3];
+
+				  extractTupel1->GetOutput()->GetPoint(pointId, tupel1);
+				  extractTupel2->GetOutput()->GetPoint(pointId, tupel2);
+				  extractTupel3->GetOutput()->GetPoint(pointId, tupel3);
+
+				  cout << "Tupel 1:" << tupel1[0] << "|" << tupel1[1] << "|" << tupel1[2] << "|" << endl;
+				  cout << "Tupel 2:" << tupel2[0] << "|" << tupel2[1] << "|" << tupel2[2] << "|" << endl;
+				  cout << "Tupel 3:" << tupel3[0] << "|" << tupel3[1] << "|" << tupel3[2] << "|" << endl;
+				  cout << "----------------------------" << endl;
+
+				  //double* tensor = dataarray->GetTuple(pointId);
+				  //cout << *(tensor)<<endl;
 				  //vtkSmartPointer<vtkCell> currentCell = vtkSmartPointer<vtkCell>::New();
 				  //currentCell = input->GetCell(currentCellId);
 
 			  }
 		  }
       }
+	  
 	  //vtkDoubleArray* tensors = reinterpret_cast<vtkDoubleArray *>( pointdata->GetNumberOfArrays());
 	  //vtkIdType idtype = tensors->GetNumberOfComponents();
 	  //std::cout << idtype;
 	  //std::cout << tensors->GetNumberOfTuples();
-      /*
+      
+	  /*
 	  for (int z = 0; z < dim[2]; z++)
 	  {
 		  for (int y = 0; y < dim[1]; y++)
@@ -342,47 +372,6 @@ int main(int argc, char *argv[])
       // Create our volume and mapper
       vtkSmartPointer<vtkVolume> volume = vtkSmartPointer<vtkVolume>::New();
       vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
-
-
-	  ///////////#Valle
-
-	  //vtkSmartPointer<vtkStructuredGrid> grid = vtkSmartPointer<vtkStructuredGrid>::New();
-
-<<<<<<< .merge_file_a08504
-	  std::cout << "Dims: " << " x: " << dim[0] << " y: " << dim[1] << " z: " << dim[2] << std::endl;
-	  std::cout << "Number of points: " << input->GetNumberOfPoints() << std::endl;
-	  std::cout << "Number of cells: " << input->GetNumberOfCells() << std::endl;
-
-	  for (int z = 0; z < dim[2]; z++)
-	  {
-		  for (int y = 0; y < dim[1]; y++)
-		  {
-			  for (int x = 0; x < dim[0]; x++)
-			  {
-				  int ijk[3];
-				  ijk[0] = x;
-				  ijk[1] = y;
-				  ijk[2] = z;
-				  vtkIdType currentCellId = input->ComputeCellId(ijk);
-
-				  //vtkSmartPointer<vtkCell> currentCell = vtkSmartPointer<vtkCell>::New();
-				  //currentCell = input->GetCell(currentCellId);
-
-				  double cellVector[3];
-				  input->GetPoint(currentCellId, cellVector);
-				  vtkSmartPointer<vtkPointData> pointData = vtkSmartPointer<vtkPointData>::New();
-				  pointData = input->GetPointData();
-				  std::cout << cellVector[0] << cellVector[1] << cellVector[2] << std::endl;
-				  std::cout << "----------  New Data" << std::endl;
-			  }
-		  }
-	  }
-
-	  ///////////#Valle
-
-=======
->>>>>>> .merge_file_a02312
-
 
       View* view1 =NULL;
 
