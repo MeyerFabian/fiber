@@ -43,6 +43,8 @@
 #include "vtkDoubleArray.h"
 #include "vtkCellData.h"
 #include "vtkImageExtractComponents.h"
+#include "vtkVector.h"
+#include "vtkVectorDot.h"
 
 #include <QVTKWidget.h>
 #include "Rendering/QVTKWrapper.h"
@@ -309,6 +311,10 @@ int main(int argc, char *argv[])
 				  cout << "Tupel 3:" << tupel3[0] << "|" << tupel3[1] << "|" << tupel3[2] << "|" << endl;
 				  cout << "----------------------------" << endl;
 
+				  //vtkDataArray* arrayy;
+				  //input->GetArrayPointer(arrayy, ijk);
+				  //double* pixel = static_cast<double*>(input->GetArrayPointer(arrayy, ijk));
+
 				  //double* tensor = dataarray->GetTuple(pointId);
 				  //cout << *(tensor)<<endl;
 				  //vtkSmartPointer<vtkCell> currentCell = vtkSmartPointer<vtkCell>::New();
@@ -347,7 +353,6 @@ int main(int argc, char *argv[])
 		  }
 	  }
       */
-	  ///////////#Valle
 
 
       // Verify that we actually have a volume
@@ -512,3 +517,64 @@ int main(int argc, char *argv[])
 
     return a.exec();
 }
+
+/*
+void TraverseVoxel(vtkVector3d startPoint){
+	
+	//Global/GUI Parameters
+	float stepSize = 1;
+	float f, g;
+
+	vtkSmartPointer<vtkVector3d> currentPos = vtkSmartPointer<vtkVector3d>::New();
+	vtkSmartPointer<vtkVector3d> currentDir = vtkSmartPointer<vtkVector3d>::New();		//= next step direction = incoming direction = V_n-1
+	
+	//Initialize
+	currentPos->Set(startPoint.X, startPoint.Y, startPoint.Z);
+	currentCell = input->FindCell(currentPos);
+	tensors = currentCell.Tensors;
+	vtkVector3d eigenvector1, eigenvector2, eigenvector3 = getEigenvectors(tensors);
+	int random = rand() % 3 + 1;					// In the range 1 to 3	//Make vector-norm dependent!
+
+	if (random == 1)
+		currentDir = eigenvector1.Normalize;
+	else if (random == 2)
+		currentDir = eigenvector2.Normalize;
+	else if (random == 3)
+		currentDir = eigenvector3.Normalize;
+	else
+		ThrowError;
+
+
+
+	while (ABBRUCHBED){
+
+		//Perform step
+		currentPos += currentDir.Normalize*stepSize;
+
+		//Check if entering new voxel
+		newCell = input->FindCell(currentPos);
+		
+		if (newCell.ID != currentCell.id){		//When entering new voxel
+			//Determine next direction with smallest angle to incoming direction
+			newTensors = newCell.Tensors;
+			vtkVector3d newEigenvector1, newEigenvector2, newEigenvector3 = getEigenvectors(newTensors);
+			float angle1 = eigenvector1.Dot(currentDir);
+			float angle2 = eigenvector2.Dot(currentDir);
+			float angle3 = eigenvector3.Dot(currentDir);
+			vtkVector3d v_n = findSmallestAngle(angle1, angle2, angle3);
+
+			vtkVector3d v_nPlus1 = f*v_n + (1 - f)((1 - g)currentDir + g*v_n);		//Tracking formula //Gives out next direction
+			currentDir = v_nPlus1;
+		}
+		else{
+			?
+		}
+
+		// Draw the Hyperstreamline between those two points
+		vtkVector3d point1 = currentPos;
+		vtkVector3d point2 = currentPos + currentDir;
+
+		HyperstreamlineRenderer.Append(point1, point2);
+	}
+
+}*/
