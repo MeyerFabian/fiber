@@ -9,6 +9,7 @@
 #include "vtkPointData.h"
 #include "vtkDoubleArray.h"
 #include "vtkDenseArray.h"
+#include "vtkGenericCellIterator.h"
 
 class TensorComputations
 {

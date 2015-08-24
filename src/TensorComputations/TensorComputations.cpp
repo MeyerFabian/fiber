@@ -19,11 +19,11 @@ vtkSmartPointer<vtkDenseArray<double> > TensorComputations::GetTensorsFromNIFTI(
     vtkSmartPointer<vtkDataArray> tensors = niftiReader->GetOutput()->GetPointData()->GetScalars();
     vtkSmartPointer<vtkImageData> imgData = niftiReader->GetOutput();
 
-	const int numberOfCells = niftiReader->GetOutput()->GetNumberOfCells();
+	const int numberOfPoints = niftiReader->GetOutput()->GetPointData()->GetNumberOfTuples();
 
 	//vector<vector<double> > tensorArray = make_2DimVector<double>(numberOfCells, 9);
     vtkSmartPointer<vtkDenseArray<double> > tensorArray = vtkSmartPointer<vtkDenseArray<double> >::New();
-	tensorArray->Resize(numberOfCells, 9);
+	tensorArray->Resize(numberOfPoints, 9);
 
 	int globalCounter = 0;
 
@@ -47,7 +47,7 @@ vtkSmartPointer<vtkDenseArray<double> > TensorComputations::GetTensorsFromNIFTI(
                 for each (double tensorValue in tensor)
 				{
                     // line doesnt work
-                    //tensorArray->SetValue(globalCounter,localCounter,tensorValue);
+                    tensorArray->SetValue(globalCounter,localCounter,tensorValue);
                     localCounter++;
 				}
 
@@ -55,6 +55,16 @@ vtkSmartPointer<vtkDenseArray<double> > TensorComputations::GetTensorsFromNIFTI(
 			}
 		}
 	}
+
+	/*vtkGenericDataSet *dataset;
+	vtkGenericCellIterator *it = dataset->NewCellIterator(2);
+	for (it->Begin(); !it->IsAtEnd(); it->Next());
+	{
+		spec = it->GetCell();
+	}
+
+	cout << dim[0] << " " << dim[1] << " " << dim[2] << endl;
+	cout << globalCounter << endl;*/
 
 	return tensorArray;
 }
