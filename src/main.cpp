@@ -43,6 +43,13 @@
 #include "vtkDoubleArray.h"
 #include "vtkCellData.h"
 
+#include "vtkVector.h"
+#include "vtkVectorDot.h"
+#include "TensorComputations/TensorComputations.h"
+#include <vector>
+#include <cstddef> // für size_t
+using namespace std;
+
 #include <QVTKWidget.h>
 #include "Rendering/QVTKWrapper.h"
 #include "Rendering/ImagePlaneView.h"
@@ -93,9 +100,6 @@ void PrintUsage()
   int i = 0;
   cin >> i;
 }
-
-
-
 
 int main(int argc, char *argv[])
 {
@@ -230,6 +234,17 @@ int main(int argc, char *argv[])
           std::cout << "NumberofScalarComponents: " << reader->GetNumberOfScalarComponents()<< std::endl;
           input=reader->GetOutput();
 
+		  //#Valle: Get tensors from data #VERBESSERN
+		  TensorComputations* tensorComp = NULL;
+		  tensorComp = new TensorComputations();
+		  int dim[3];
+		  input->GetDimensions(dim);
+		  vtkDenseArray<double> *tensors = tensorComp->GetTensorsFromNIFTI(niftreader, dim);
+
+		  //Valle: Call main traverse function
+		  //TrackFibers(startpoint, input, tensors);
+
+          reader=niftreader;
         }
       else
         {
@@ -242,8 +257,6 @@ int main(int argc, char *argv[])
 	  std::cout << "Dims: " << " x: " << dim[0] << " y: " << dim[1] << " z: " << dim[2] << std::endl;
 	  std::cout << "Number of points: " << input->GetNumberOfPoints() << std::endl;
 	  std::cout << "Number of cells: " << input->GetNumberOfCells() << std::endl;
-
-	  
       std::cout << "Data dimension: " << input->GetDataDimension()<<std::endl;
 	  
 	  vtkFieldData* fielddata = input->GetFieldData();
@@ -271,56 +284,6 @@ int main(int argc, char *argv[])
       std::cout << "Number of Tuples(celldata): " << ct << endl;
 
 
-	  for (int z = 0; z < dim[2]; z++)
-	  {
-		  for (int y = 0; y < dim[1]; y++)
-		  {
-			  for (int x = 0; x < dim[0]; x++)
-			  {
-				  int ijk[3];
-				  ijk[0] = x;
-				  ijk[1] = y;
-				  ijk[2] = z;
-				  vtkIdType pointId = input->ComputePointId(ijk);
-
-				  double* tensor = dataarray->GetTuple(pointId);
-                  //cout << *(tensor)<<endl;
-				  //vtkSmartPointer<vtkCell> currentCell = vtkSmartPointer<vtkCell>::New();
-				  //currentCell = input->GetCell(currentCellId);
-
-			  }
-		  }
-      }
-	  //vtkDoubleArray* tensors = reinterpret_cast<vtkDoubleArray *>( pointdata->GetNumberOfArrays());
-	  //vtkIdType idtype = tensors->GetNumberOfComponents();
-	  //std::cout << idtype;
-	  //std::cout << tensors->GetNumberOfTuples();
-      /*
-	  for (int z = 0; z < dim[2]; z++)
-	  {
-		  for (int y = 0; y < dim[1]; y++)
-		  {
-			  for (int x = 0; x < dim[0]; x++)
-			  {
-				  int ijk[3];
-				  ijk[0] = x;
-				  ijk[1] = y;
-				  ijk[2] = z;
-				  vtkIdType currentCellId = input->ComputeCellId(ijk);
-
-				  //vtkSmartPointer<vtkCell> currentCell = vtkSmartPointer<vtkCell>::New();
-
-
-				  double cellVector[4];
-
-				  input->GetPoint(currentCellId, cellVector);
-				  std::cout << cellVector[3] << endl;// << cellVector[1] << cellVector[2] << std::endl;
-			  }
-		  }
-	  }
-      */
-	  ///////////#Valle
-
 
       // Verify that we actually have a volume
 
@@ -344,13 +307,6 @@ int main(int argc, char *argv[])
       // Create our volume and mapper
       vtkSmartPointer<vtkVolume> volume = vtkSmartPointer<vtkVolume>::New();
       vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
-
-
-	  ///////////#Valle
-
-	  //vtkSmartPointer<vtkStructuredGrid> grid = vtkSmartPointer<vtkStructuredGrid>::New();
-
-
 
       View* view1 =NULL;
 
@@ -491,3 +447,60 @@ int main(int argc, char *argv[])
 
     return a.exec();
 }
+
+/*
+void TrackFibers(vtkVector3d startPoint, vtkSmartPointer<vtkImageData> input, vtkDenseArray<double> tensors){
+	
+	//Global/GUI Parameters
+	float stepSize = 1;
+	float f, g;
+
+	vtkSmartPointer<vtkVector3d> currentPos = vtkSmartPointer<vtkVector3d>::New();
+	vtkSmartPointer<vtkVector3d> currentDir = vtkSmartPointer<vtkVector3d>::New();		//= next step direction = incoming direction = V_n-1
+	
+	//Initialize
+	currentPos->Set(startPoint.X, startPoint.Y, startPoint.Z);
+	currentCell = input->FindCell(currentPos);
+	vtkVector3d eigenvector1, eigenvector2, eigenvector3 = getEigenvectors(tensors);
+	int random = rand() % 3 + 1;					// In the range 1 to 3	//Make vector-norm dependent!
+
+	if (random == 1)
+		currentDir = eigenvector1.Normalize;
+	else if (random == 2)
+		currentDir = eigenvector2.Normalize;
+	else if (random == 3)
+		currentDir = eigenvector3.Normalize;
+	else
+		ThrowError;
+
+
+
+	while (ABBRUCHBED){
+
+		//Perform step
+		currentPos += currentDir.Normalize*stepSize;
+
+		//Check if entering new voxel
+		newCell = input->FindCell(currentPos);
+		
+		if (newCell.ID != currentCell.id){		//When entering new voxel
+			//Determine next direction with smallest angle to incoming direction
+			newTensors = newCell.Tensors;
+			vtkVector3d newEigenvector1, newEigenvector2, newEigenvector3 = getEigenvectors(newTensors);
+			float angle1 = eigenvector1.Dot(currentDir);
+			float angle2 = eigenvector2.Dot(currentDir);
+			float angle3 = eigenvector3.Dot(currentDir);
+			vtkVector3d v_n = findSmallestAngle(angle1, angle2, angle3);
+
+			vtkVector3d v_nPlus1 = f*v_n + (1 - f)((1 - g)currentDir + g*v_n);		//Tracking formula //Gives out next direction
+			currentDir = v_nPlus1;
+		}
+		else{
+			?
+		}
+
+		// Add point and tangent vector to renderer
+		HyperstreamBSplineRenderer.Append(currentPos, currentDir, streamlineID);
+	}
+
+}*/
