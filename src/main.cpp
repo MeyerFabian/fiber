@@ -218,17 +218,18 @@ int main(int argc, char *argv[])
         }
 
       // Read the data
-      vtkSmartPointer<vtkAlgorithm> reader=0;
+      vtkSmartPointer<vtkImageReader2> reader=0;
       vtkSmartPointer<vtkImageData> input=0;
       if ( fileType == NIFTI_FILETYPE ){
           vtkSmartPointer<vtkNIFTIImageReader> niftreader = vtkSmartPointer<vtkNIFTIImageReader>::New();
           niftreader->SetFileName(fileName);
-          niftreader->Update();
 
-		  std::cout << "File dimension: " << niftreader->GetFileDimensionality() << std::endl;
-          input=niftreader->GetOutput();
+          std::cout << "File dimension: " << niftreader->GetFileDimensionality() << std::endl;
+          reader = niftreader;
+          reader->Update();
+          std::cout << "NumberofScalarComponents: " << reader->GetNumberOfScalarComponents()<< std::endl;
+          input=reader->GetOutput();
 
-          reader=niftreader;
         }
       else
         {
@@ -265,9 +266,10 @@ int main(int argc, char *argv[])
 
 	  vtkCellData* celldata = input->GetCellData();
 	  int cc = celldata->GetNumberOfComponents();
-	  std::cout << "Number of Components(dataarray): " << cc << endl;
+      std::cout << "Number of Components(celldata): " << cc << endl;
 	  int ct = celldata->GetNumberOfTuples();
-	  std::cout << "Number of Tuples(dataarray): " << ct << endl;
+      std::cout << "Number of Tuples(celldata): " << ct << endl;
+
 
 	  for (int z = 0; z < dim[2]; z++)
 	  {
@@ -282,7 +284,7 @@ int main(int argc, char *argv[])
 				  vtkIdType pointId = input->ComputePointId(ijk);
 
 				  double* tensor = dataarray->GetTuple(pointId);
-				  cout << *(tensor)<<endl;
+                  //cout << *(tensor)<<endl;
 				  //vtkSmartPointer<vtkCell> currentCell = vtkSmartPointer<vtkCell>::New();
 				  //currentCell = input->GetCell(currentCellId);
 
