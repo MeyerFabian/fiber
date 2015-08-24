@@ -224,6 +224,8 @@ int main(int argc, char *argv[])
       // Read the data
       vtkSmartPointer<vtkImageReader2> reader=0;
       vtkSmartPointer<vtkImageData> input=0;
+
+	  TensorComputations* tensorComp = NULL;
       if ( fileType == NIFTI_FILETYPE ){
           vtkSmartPointer<vtkNIFTIImageReader> niftreader = vtkSmartPointer<vtkNIFTIImageReader>::New();
           niftreader->SetFileName(fileName);
@@ -233,11 +235,10 @@ int main(int argc, char *argv[])
           input=reader->GetOutput();
 
 		  //#Valle: Get tensors from data #VERBESSERN
-		  TensorComputations* tensorComp = NULL;
 		  tensorComp = new TensorComputations();
 		  int dim[3];
 		  input->GetDimensions(dim);
-          vtkDenseArray<double> *tensors = tensorComp->GetTensorsFromNIFTI(niftreader, dim);
+          vtkSmartPointer<vtkDenseArray<double> >tensors = tensorComp->GetTensorsFromNIFTI(niftreader, dim);
 
             //Valle: Call main traverse function
             //TrackFibers(startpoint, input, tensors);
@@ -412,7 +413,7 @@ int main(int argc, char *argv[])
      delete uimw;
      delete window1;
      delete view1;
-
+	 delete tensorComp;
     return a.exec();
 }
 
