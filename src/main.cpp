@@ -228,10 +228,8 @@ int main(int argc, char *argv[])
           vtkSmartPointer<vtkNIFTIImageReader> niftreader = vtkSmartPointer<vtkNIFTIImageReader>::New();
           niftreader->SetFileName(fileName);
 
-          std::cout << "File dimension: " << niftreader->GetFileDimensionality() << std::endl;
           reader = niftreader;
           reader->Update();
-          std::cout << "NumberofScalarComponents: " << reader->GetNumberOfScalarComponents()<< std::endl;
           input=reader->GetOutput();
 
 		  //#Valle: Get tensors from data #VERBESSERN
@@ -239,10 +237,10 @@ int main(int argc, char *argv[])
 		  tensorComp = new TensorComputations();
 		  int dim[3];
 		  input->GetDimensions(dim);
-		  vtkDenseArray<double> *tensors = tensorComp->GetTensorsFromNIFTI(niftreader, dim);
+          vtkDenseArray<double> *tensors = tensorComp->GetTensorsFromNIFTI(niftreader, dim);
 
-		  //Valle: Call main traverse function
-		  //TrackFibers(startpoint, input, tensors);
+            //Valle: Call main traverse function
+            //TrackFibers(startpoint, input, tensors);
 
           reader=niftreader;
         }
@@ -253,36 +251,6 @@ int main(int argc, char *argv[])
         }
 	  int dim[3];
 	  input->GetDimensions(dim);
-
-	  std::cout << "Dims: " << " x: " << dim[0] << " y: " << dim[1] << " z: " << dim[2] << std::endl;
-	  std::cout << "Number of points: " << input->GetNumberOfPoints() << std::endl;
-	  std::cout << "Number of cells: " << input->GetNumberOfCells() << std::endl;
-      std::cout << "Data dimension: " << input->GetDataDimension()<<std::endl;
-	  
-	  vtkFieldData* fielddata = input->GetFieldData();
-	  int fc = fielddata->GetNumberOfComponents();
-	  std::cout << "Number of Components(fielddata): " << fc << endl;
-	  int ft = fielddata->GetNumberOfTuples();
-	  std::cout << "Number of Tuples(fielddata): " << ft << endl;
-
-	  vtkPointData* pointdata = input->GetPointData();
-	  int pc = pointdata->GetNumberOfComponents();
-	  std::cout << "Number of Components(pointdata): " << pc << endl;
-	  int pt = pointdata->GetNumberOfTuples();
-	  std::cout << "Number of Tuples(pointdata): " << pt << endl;
-
-	  vtkDataArray* dataarray = pointdata->GetArray(0);
-	  int dc = dataarray->GetNumberOfComponents();
-	  std::cout << "Number of Components(dataarray): " << dc << endl;
-	  int dt = dataarray->GetNumberOfTuples();
-	  std::cout << "Number of Tuples(dataarray): " << dt << endl;
-
-	  vtkCellData* celldata = input->GetCellData();
-	  int cc = celldata->GetNumberOfComponents();
-      std::cout << "Number of Components(celldata): " << cc << endl;
-	  int ct = celldata->GetNumberOfTuples();
-      std::cout << "Number of Tuples(celldata): " << ct << endl;
-
 
 
       // Verify that we actually have a volume

@@ -11,18 +11,18 @@ TensorComputations::~TensorComputations()
 {
 }
 
-vtkDenseArray<double>* TensorComputations::GetTensorsFromNIFTI(vtkSmartPointer<vtkNIFTIImageReader> &niftiReader, int dim[]){
+vtkSmartPointer<vtkDenseArray<double> > TensorComputations::GetTensorsFromNIFTI(vtkSmartPointer<vtkNIFTIImageReader> niftiReader, int dim[]){
 
 	niftiReader->Update();
 
 	//#Valle: Read out tensor data
-	vtkDataArray *tensors = niftiReader->GetOutput()->GetPointData()->GetScalars();
-	vtkImageData *imgData = niftiReader->GetOutput();
+    vtkSmartPointer<vtkDataArray> tensors = niftiReader->GetOutput()->GetPointData()->GetScalars();
+    vtkSmartPointer<vtkImageData> imgData = niftiReader->GetOutput();
 
 	const int numberOfCells = niftiReader->GetOutput()->GetNumberOfCells();
 
 	//vector<vector<double> > tensorArray = make_2DimVector<double>(numberOfCells, 9);
-	vtkDenseArray<double> *tensorArray = vtkDenseArray<double>::New();
+    vtkSmartPointer<vtkDenseArray<double> > tensorArray = vtkSmartPointer<vtkDenseArray<double> >::New();
 	tensorArray->Resize(numberOfCells, 9);
 
 	int globalCounter = 0;
@@ -44,10 +44,11 @@ vtkDenseArray<double>* TensorComputations::GetTensorsFromNIFTI(vtkSmartPointer<v
 
 				int localCounter = 0;
 
-				for each (double tensorValue in tensor)
+                for each (double tensorValue in tensor)
 				{
-					tensorArray->SetValue(globalCounter,localCounter,tensorValue);
-					localCounter++;
+                    // line doesnt work
+                    //tensorArray->SetValue(globalCounter,localCounter,tensorValue);
+                    localCounter++;
 				}
 
 				globalCounter++;

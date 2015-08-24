@@ -14,7 +14,7 @@ class TensorComputations
 {
 public:
 	TensorComputations();
-	vtkDenseArray<double>* GetTensorsFromNIFTI(vtkSmartPointer<vtkNIFTIImageReader> &niftiReader, int dim[]);
+    vtkSmartPointer<vtkDenseArray<double> > GetTensorsFromNIFTI(vtkSmartPointer<vtkNIFTIImageReader> niftiReader, int dim[]);
 	~TensorComputations();
 };
 
