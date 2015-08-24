@@ -42,9 +42,13 @@
 #include "vtkPointData.h"
 #include "vtkDoubleArray.h"
 #include "vtkCellData.h"
-#include "vtkImageExtractComponents.h"
+
 #include "vtkVector.h"
 #include "vtkVectorDot.h"
+#include "TensorComputations/TensorComputations.h"
+#include <vector>
+#include <cstddef> // für size_t
+using namespace std;
 
 #include <QVTKWidget.h>
 #include "Rendering/QVTKWrapper.h"
@@ -96,9 +100,6 @@ void PrintUsage()
   int i = 0;
   cin >> i;
 }
-
-
-
 
 int main(int argc, char *argv[])
 {
@@ -231,6 +232,16 @@ int main(int argc, char *argv[])
 		  std::cout << "File dimension: " << niftreader->GetFileDimensionality() << std::endl;
           input=niftreader->GetOutput();
 
+		  //#Valle: Get tensors from data #VERBESSERN
+		  TensorComputations* tensorComp = NULL;
+		  tensorComp = new TensorComputations();
+		  int dim[3];
+		  input->GetDimensions(dim);
+		  vtkDenseArray<double> *tensors = tensorComp->GetTensorsFromNIFTI(niftreader, dim);
+
+		  //Valle: Call main traverse function
+		  //TrackFibers(startpoint, input, tensors);
+
           reader=niftreader;
         }
       else
@@ -269,90 +280,6 @@ int main(int argc, char *argv[])
 	  std::cout << "Number of Components(dataarray): " << cc << endl;
 	  int ct = celldata->GetNumberOfTuples();
 	  std::cout << "Number of Tuples(dataarray): " << ct << endl;
-
-	  //Extract Tensor Data
-	  vtkSmartPointer<vtkImageExtractComponents> extractTupel1 = vtkSmartPointer<vtkImageExtractComponents>::New();
-	  extractTupel1->SetInputConnection(reader->GetOutputPort());
-	  extractTupel1->SetComponents(0,1,2);
-	  extractTupel1->Update();
-
-	  vtkSmartPointer<vtkImageExtractComponents> extractTupel2 = vtkSmartPointer<vtkImageExtractComponents>::New();
-	  extractTupel2->SetInputConnection(reader->GetOutputPort());
-	  extractTupel2->SetComponents(3, 4, 5);
-	  extractTupel2->Update();
-
-	  vtkSmartPointer<vtkImageExtractComponents> extractTupel3 = vtkSmartPointer<vtkImageExtractComponents>::New();
-	  extractTupel3->SetInputConnection(reader->GetOutputPort());
-	  extractTupel3->SetComponents(6, 7, 8);
-	  extractTupel3->Update();
-
-	  for (int z = 0; z < dim[2]; z++)
-	  {
-		  for (int y = 0; y < dim[1]; y++)
-		  {
-			  for (int x = 0; x < dim[0]; x++)
-			  {
-				  int ijk[3];
-				  ijk[0] = x;
-				  ijk[1] = y;
-				  ijk[2] = z;
-				  vtkIdType pointId = input->ComputePointId(ijk);
-
-				  double tupel1[3];
-				  double tupel2[3];
-				  double tupel3[3];
-
-				  extractTupel1->GetOutput()->GetPoint(pointId, tupel1);
-				  extractTupel2->GetOutput()->GetPoint(pointId, tupel2);
-				  extractTupel3->GetOutput()->GetPoint(pointId, tupel3);
-
-				  cout << "Tupel 1:" << tupel1[0] << "|" << tupel1[1] << "|" << tupel1[2] << "|" << endl;
-				  cout << "Tupel 2:" << tupel2[0] << "|" << tupel2[1] << "|" << tupel2[2] << "|" << endl;
-				  cout << "Tupel 3:" << tupel3[0] << "|" << tupel3[1] << "|" << tupel3[2] << "|" << endl;
-				  cout << "----------------------------" << endl;
-
-				  //vtkDataArray* arrayy;
-				  //input->GetArrayPointer(arrayy, ijk);
-				  //double* pixel = static_cast<double*>(input->GetArrayPointer(arrayy, ijk));
-
-				  //double* tensor = dataarray->GetTuple(pointId);
-				  //cout << *(tensor)<<endl;
-				  //vtkSmartPointer<vtkCell> currentCell = vtkSmartPointer<vtkCell>::New();
-				  //currentCell = input->GetCell(currentCellId);
-
-			  }
-		  }
-      }
-	  
-	  //vtkDoubleArray* tensors = reinterpret_cast<vtkDoubleArray *>( pointdata->GetNumberOfArrays());
-	  //vtkIdType idtype = tensors->GetNumberOfComponents();
-	  //std::cout << idtype;
-	  //std::cout << tensors->GetNumberOfTuples();
-      
-	  /*
-	  for (int z = 0; z < dim[2]; z++)
-	  {
-		  for (int y = 0; y < dim[1]; y++)
-		  {
-			  for (int x = 0; x < dim[0]; x++)
-			  {
-				  int ijk[3];
-				  ijk[0] = x;
-				  ijk[1] = y;
-				  ijk[2] = z;
-				  vtkIdType currentCellId = input->ComputeCellId(ijk);
-
-				  //vtkSmartPointer<vtkCell> currentCell = vtkSmartPointer<vtkCell>::New();
-
-
-				  double cellVector[4];
-
-				  input->GetPoint(currentCellId, cellVector);
-				  std::cout << cellVector[3] << endl;// << cellVector[1] << cellVector[2] << std::endl;
-			  }
-		  }
-	  }
-      */
 
 
       // Verify that we actually have a volume
@@ -519,7 +446,7 @@ int main(int argc, char *argv[])
 }
 
 /*
-void TraverseVoxel(vtkVector3d startPoint){
+void TrackFibers(vtkVector3d startPoint, vtkSmartPointer<vtkImageData> input, vtkDenseArray<double> tensors){
 	
 	//Global/GUI Parameters
 	float stepSize = 1;
@@ -531,7 +458,6 @@ void TraverseVoxel(vtkVector3d startPoint){
 	//Initialize
 	currentPos->Set(startPoint.X, startPoint.Y, startPoint.Z);
 	currentCell = input->FindCell(currentPos);
-	tensors = currentCell.Tensors;
 	vtkVector3d eigenvector1, eigenvector2, eigenvector3 = getEigenvectors(tensors);
 	int random = rand() % 3 + 1;					// In the range 1 to 3	//Make vector-norm dependent!
 
@@ -570,11 +496,8 @@ void TraverseVoxel(vtkVector3d startPoint){
 			?
 		}
 
-		// Draw the Hyperstreamline between those two points
-		vtkVector3d point1 = currentPos;
-		vtkVector3d point2 = currentPos + currentDir;
-
-		HyperstreamlineRenderer.Append(point1, point2);
+		// Add point and tangent vector to renderer
+		HyperstreamBSplineRenderer.Append(currentPos, currentDir, streamlineID);
 	}
 
 }*/
