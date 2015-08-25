@@ -7,8 +7,9 @@
 #include "vtkDataArray.h"
 #include "vtkImageData.h"
 #include "vtkPointData.h"
-#include "vtkDoubleArray.h"
-#include "vtkDenseArray.h"
+#include "vtkMatrix3x3.h"
+//#include "vtkDoubleArray.h"
+//#include "vtkDenseArray.h"
 //#include "vtkGenericCellIterator.h"
 
 #include <vtkVersion.h>
@@ -23,8 +24,12 @@ class TensorComputations
 {
 public:
 	TensorComputations();
-    vtkSmartPointer<vtkDenseArray<double> > GetTensorsFromNIFTI(vtkSmartPointer<vtkNIFTIImageReader> niftiReader, int dim[]);
-	void GetEigenvectorsFromTensor(vtkSmartPointer<vtkDenseArray<double>> tensors, vtkSmartPointer<vtkDoubleArray> *eigenvector1, vtkSmartPointer<vtkDoubleArray> *eigenvector2, vtkSmartPointer<vtkDoubleArray> *eigenvector3);
+	// Description:
+	// Get Tensor from a NIFTI image at a specific point, specified by the pointID.
+	vtkSmartPointer<vtkMatrix3x3> GetTensorsFromNIFTI(vtkSmartPointer<vtkImageReader2> niftiReader, vtkIdType pointID);
+	// Description:
+	// Get the three eigenvectors stored in a 3x3 matrix from a second order 3x3 tensor.
+	vtkSmartPointer<vtkMatrix3x3> GetEigenvectorsFromTensor(vtkSmartPointer<vtkMatrix3x3> tensor);
 	~TensorComputations();
 };
 

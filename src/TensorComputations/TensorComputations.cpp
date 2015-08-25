@@ -11,67 +11,35 @@ TensorComputations::~TensorComputations()
 {
 }
 
-vtkSmartPointer<vtkDenseArray<double> > TensorComputations::GetTensorsFromNIFTI(vtkSmartPointer<vtkNIFTIImageReader> niftiReader, int dim[]){
+vtkSmartPointer<vtkMatrix3x3> TensorComputations::GetTensorsFromNIFTI(vtkSmartPointer<vtkImageReader2> niftiReader, vtkIdType pointID){
 
 	niftiReader->Update();
 
 	//#Valle: Read out tensor data
 	vtkSmartPointer<vtkDataArray> tensors = niftiReader->GetOutput()->GetPointData()->GetScalars();
-	vtkSmartPointer<vtkImageData> imgData = niftiReader->GetOutput();
+	vtkSmartPointer<vtkMatrix3x3 > tensorMatrix = vtkSmartPointer<vtkMatrix3x3>::New();
+	double tensor[9];
+	tensors->GetTuple(pointID, tensor);
 
-	const int numberOfPoints = niftiReader->GetOutput()->GetPointData()->GetNumberOfTuples();
+	int x, y = 0;
 
-	//vector<vector<double> > tensorArray = make_2DimVector<double>(numberOfCells, 9);
-	vtkSmartPointer<vtkDenseArray<double> > tensorArray = vtkSmartPointer<vtkDenseArray<double> >::New();
-	tensorArray->Resize(numberOfPoints, 9);
-
-	int globalCounter = 0;
-
-	for (int z = 0; z < dim[2]; z++)
+	for (int i = 0; i < 9; i++)
 	{
-		for (int y = 0; y < dim[1]; y++)
-		{
-			for (int x = 0; x < dim[0]; x++)
-			{
-				int ijk[3];
-				ijk[0] = x;
-				ijk[1] = y;
-				ijk[2] = z;
-				vtkIdType pointId = imgData->ComputeCellId(ijk);	//korrekte Methode?
-
-				double tensor[9];
-				tensors->GetTuple(pointId, tensor);
-
-				int localCounter = 0;
-
-				for (int i = 0; i < 9; i++)
-				{
-					// line doesnt work
-					tensorArray->SetValue(globalCounter, localCounter, tensor[i]);
-					localCounter++;
-				}
-
-				globalCounter++;
-			}
+		if (i % 3 == 0){
+			x = 0;
+			y++;
 		}
+
+		tensorMatrix->SetElement(x, y, tensor[i]);
 	}
 
-	/*vtkGenericDataSet *dataset;
-	vtkGenericCellIterator *it = dataset->NewCellIterator(2);
-	for (it->Begin(); !it->IsAtEnd(); it->Next());
-	{
-	spec = it->GetCell();
-	}
-
-	cout << dim[0] << " " << dim[1] << " " << dim[2] << endl;
-	cout << globalCounter << endl;*/
-
-	return tensorArray;
+	delete tensor, x, y;
+	return tensorMatrix;
 }
 
 
 
-void GetEigenvectorsFromTensor(vtkSmartPointer<vtkDenseArray<double>> tensors, vtkSmartPointer<vtkDoubleArray> *eigenvector1, vtkSmartPointer<vtkDoubleArray> *eigenvector2, vtkSmartPointer<vtkDoubleArray> *eigenvector3)
+vtkSmartPointer<vtkMatrix3x3> TensorComputations::GetEigenvectorsFromTensor(vtkSmartPointer<vtkMatrix3x3> tensor)
 {
 	// Each one of these arrays is a single component of
 	// the data. That is, if you have 3D spatial data (x,y,z)
@@ -86,37 +54,34 @@ void GetEigenvectorsFromTensor(vtkSmartPointer<vtkDenseArray<double>> tensors, v
 	vtkSmartPointer<vtkDoubleArray> dataset1Arr = vtkSmartPointer<vtkDoubleArray>::New();
 	dataset1Arr->SetNumberOfComponents(1);
 	dataset1Arr->SetName(m0Name);
-	dataset1Arr->InsertNextValue(0);
-	dataset1Arr->InsertNextValue(1);
-	dataset1Arr->InsertNextValue(0);
-
-	tensors->GetValue(1, 0);
+	dataset1Arr->InsertNextValue(tensor->GetElement(0, 0));		//Reihenfolge checken!
+	dataset1Arr->InsertNextValue(tensor->GetElement(0, 1));
+	dataset1Arr->InsertNextValue(tensor->GetElement(0, 2));
 
 	// These would be all of your "y" values.
 	const char m1Name[] = "M1";
 	vtkSmartPointer<vtkDoubleArray> dataset2Arr = vtkSmartPointer<vtkDoubleArray>::New();
 	dataset2Arr->SetNumberOfComponents(1);
 	dataset2Arr->SetName(m1Name);
-	dataset2Arr->InsertNextValue(0);
-	dataset2Arr->InsertNextValue(0);
-	dataset2Arr->InsertNextValue(1);
+	dataset2Arr->InsertNextValue(tensor->GetElement(1, 0));
+	dataset2Arr->InsertNextValue(tensor->GetElement(1, 1));
+	dataset2Arr->InsertNextValue(tensor->GetElement(1, 2));
 
 	// These would be all of your "z" values.
 	const char m2Name[] = "M2";
 	vtkSmartPointer<vtkDoubleArray> dataset3Arr = vtkSmartPointer<vtkDoubleArray>::New();
 	dataset3Arr->SetNumberOfComponents(1);
 	dataset3Arr->SetName(m2Name);
-	dataset3Arr->InsertNextValue(0);
-	dataset3Arr->InsertNextValue(0);
-	dataset3Arr->InsertNextValue(0);
+	dataset3Arr->InsertNextValue(tensor->GetElement(2, 0));
+	dataset3Arr->InsertNextValue(tensor->GetElement(2, 1));
+	dataset3Arr->InsertNextValue(tensor->GetElement(2, 2));
 
 	vtkSmartPointer<vtkTable> datasetTable = vtkSmartPointer<vtkTable>::New();
 	datasetTable->AddColumn(dataset1Arr);
 	datasetTable->AddColumn(dataset2Arr);
 	datasetTable->AddColumn(dataset3Arr);
 
-	vtkSmartPointer<vtkPCAStatistics> pcaStatistics =
-		vtkSmartPointer<vtkPCAStatistics>::New();
+	vtkSmartPointer<vtkPCAStatistics> pcaStatistics = vtkSmartPointer<vtkPCAStatistics>::New();
 #if VTK_MAJOR_VERSION <= 5
 	pcaStatistics->SetInput(vtkStatisticsAlgorithm::INPUT_DATA, datasetTable);
 #else
@@ -131,34 +96,33 @@ void GetEigenvectorsFromTensor(vtkSmartPointer<vtkDenseArray<double>> tensors, v
 	pcaStatistics->Update();
 
 	///////// Eigenvalues ////////////
-	vtkSmartPointer<vtkDoubleArray> eigenvalues =
-		vtkSmartPointer<vtkDoubleArray>::New();
+	/*vtkSmartPointer<vtkDoubleArray> eigenvalues = vtkSmartPointer<vtkDoubleArray>::New();
 	pcaStatistics->GetEigenvalues(eigenvalues);
 	//  double eigenvaluesGroundTruth[3] = {.5, .166667, 0};
 	for (vtkIdType i = 0; i < eigenvalues->GetNumberOfTuples(); i++)
 	{
 		std::cout << "Eigenvalue " << i << " = " << eigenvalues->GetValue(i) << std::endl;
-	}
+	}*/
 
 	///////// Eigenvectors ////////////
-	vtkSmartPointer<vtkDoubleArray> eigenvectors =
-		vtkSmartPointer<vtkDoubleArray>::New();
+	vtkSmartPointer<vtkDoubleArray> eigenvectors = vtkSmartPointer<vtkDoubleArray>::New();
+	vtkSmartPointer<vtkMatrix3x3> eigenvectorMatrix = vtkSmartPointer<vtkMatrix3x3>::New();
 
 	pcaStatistics->GetEigenvectors(eigenvectors);
 	for (vtkIdType i = 0; i < eigenvectors->GetNumberOfTuples(); i++)
 	{
-		std::cout << "Eigenvector " << i << " : ";
+		//std::cout << "Eigenvector " << i << " : ";
 		double* evec = new double[eigenvectors->GetNumberOfComponents()];
 		eigenvectors->GetTuple(i, evec);
 		for (vtkIdType j = 0; j < eigenvectors->GetNumberOfComponents(); j++)
 		{
-			std::cout << evec[j] << " ";
-			vtkSmartPointer<vtkDoubleArray> eigenvectorSingle =
-				vtkSmartPointer<vtkDoubleArray>::New();
+			//std::cout << evec[j] << " ";
+			eigenvectorMatrix->SetElement(i, j, evec[j]);
+			vtkSmartPointer<vtkDoubleArray> eigenvectorSingle = vtkSmartPointer<vtkDoubleArray>::New();
 			pcaStatistics->GetEigenvector(i, eigenvectorSingle);
 		}
 		delete evec;
-		std::cout << std::endl;
 	}
 
+	return eigenvectorMatrix;
 }

@@ -46,6 +46,7 @@
 #include "vtkVector.h"
 #include "vtkVectorDot.h"
 #include "TensorComputations/TensorComputations.h"
+#include "vtkPointLocator.h"
 
 #include <QVTKWidget.h>
 #include "Rendering/QVTKWrapper.h"
@@ -97,6 +98,10 @@ void PrintUsage()
 	int i = 0;
 	cin >> i;
 }
+
+vtkVector3d addVec(vtkVector3d vec1, vtkVector3d vec2);
+vtkVector3d substractVec(vtkVector3d vec1, vtkVector3d vec2);
+vtkVector3d multiplyVec(vtkVector3d vec1, double scalar);
 
 int main(int argc, char *argv[])
 {
@@ -231,15 +236,6 @@ int main(int argc, char *argv[])
 		reader->Update();
 		input = reader->GetOutput();
 
-		//#Valle: Get tensors from data #VERBESSERN
-		tensorComp = new TensorComputations();
-		int dim[3];
-		input->GetDimensions(dim);
-		vtkSmartPointer<vtkDenseArray<double> >tensors = tensorComp->GetTensorsFromNIFTI(niftreader, dim);
-
-		//Valle: Call main traverse function
-		//TrackFibers(startpoint, input, tensors);
-
 		reader = niftreader;
 	}
 	else
@@ -250,7 +246,6 @@ int main(int argc, char *argv[])
 	int dim[3];
 	input->GetDimensions(dim);
 
-
 	// Verify that we actually have a volume
 
 	if (dim[0] < 2 ||
@@ -260,6 +255,140 @@ int main(int argc, char *argv[])
 		cout << "Error loading data!" << endl;
 		exit(EXIT_FAILURE);
 	}
+
+
+	//////////////////////////////////////////
+	// FIBERTRACKING MAINPART ////////////////
+	//////////////////////////////////////////
+
+	//#Valle: Get tensors from data
+	tensorComp = new TensorComputations();
+
+	for (int z = 0; z < dim[2]; z++)
+	{
+		for (int y = 0; y < dim[1]; y++)
+		{
+			for (int x = 0; x < dim[0]; x++)
+			{
+				int ijk[3];
+				ijk[0] = x;
+				ijk[1] = y;
+				ijk[2] = z;
+				vtkIdType pointID = input->ComputeCellId(ijk);	//korrekte Methode??
+
+				vtkSmartPointer<vtkMatrix3x3> tensors = tensorComp->GetTensorsFromNIFTI(reader, pointID);
+				vtkSmartPointer<vtkMatrix3x3> eigenvectors = tensorComp->GetEigenvectorsFromTensor(tensors);
+
+				//Valle: Call main traverse function
+				//TrackFibers(startpoint, input, tensors);
+			}
+		}
+	}
+
+	
+	// -------------- Global/GUI Parameters/variables
+	double stepSize = 1;
+	double f = 0;
+	double g = 0;
+	vtkVector3d one;
+	one.Set(1, 1, 1);
+	vtkVector3d startPoint;
+	startPoint.Set(0,0,0);																	//in structured coordinates for point ID
+
+	vtkVector3d currentPos;
+	vtkVector3d currentDir;																	//= next step direction = incoming direction = V_n-1
+
+	// ------------- Initialize
+
+	currentPos.Set(startPoint.GetX(), startPoint.GetY(), startPoint.GetZ());
+	int ijk[3];
+	ijk[1] = startPoint.GetX();
+	ijk[1] = startPoint.GetY();
+	ijk[1] = startPoint.GetZ();
+	vtkIdType pointID = input->ComputeCellId(ijk);											//oder input->FindCell(FindCell(currentPos); ??
+
+	vtkSmartPointer<vtkMatrix3x3> tensors = tensorComp->GetTensorsFromNIFTI(reader, pointID);
+	vtkSmartPointer<vtkMatrix3x3> eigenvectorMatrix = tensorComp->GetEigenvectorsFromTensor(tensors);
+
+	vtkVector3d eigenvectors[3];
+	eigenvectors[0].Set(eigenvectorMatrix->GetElement(0, 0), eigenvectorMatrix->GetElement(0, 1), eigenvectorMatrix->GetElement(0, 2));	//Reihenfolge?!
+	eigenvectors[1].Set(eigenvectorMatrix->GetElement(1, 0), eigenvectorMatrix->GetElement(1, 1), eigenvectorMatrix->GetElement(1, 2));
+	eigenvectors[2].Set(eigenvectorMatrix->GetElement(2, 0), eigenvectorMatrix->GetElement(2, 1), eigenvectorMatrix->GetElement(2, 2));
+
+	int random = rand() % 3 + 1;	// In the range 1 to 3	//#ToDo: Make vector-norm dependent!
+
+	if (random == 1)
+		currentDir = eigenvectors[0].Normalized();
+	else if (random == 2)
+		currentDir = eigenvectors[1].Normalized();
+	else if (random == 3)
+		currentDir = eigenvectors[2].Normalized();
+	else
+		cout << "ERROR" << endl;
+
+	// -----------------
+
+	int counter = 0;	//TEMP
+	vtkSmartPointer<vtkPointLocator> pointLocator = vtkSmartPointer<vtkPointLocator>::New();
+
+	while (counter<50){		//#ToDo: Abbruchbed. einsetzen
+		
+		double curPos[3];
+		curPos[0] = currentPos.GetX();
+		curPos[1] = currentPos.GetY();
+		curPos[2] = currentPos.GetZ();
+		pointID = pointLocator->FindClosestPoint(curPos);
+		//Perform step
+		currentPos = addVec(currentPos,multiplyVec(currentDir.Normalized(), stepSize));
+
+		//Get current corresponding pointID
+		
+		curPos[0] = currentPos.GetX();
+		curPos[1] = currentPos.GetY();
+		curPos[2] = currentPos.GetZ();
+		vtkIdType newPointID = pointLocator->FindClosestPoint(curPos);
+
+		//Check if entering new voxel
+		if (newPointID != pointID){
+			//Determine next direction with smallest angle to incoming direction
+			tensors = tensorComp->GetTensorsFromNIFTI(reader, newPointID);
+			eigenvectorMatrix = tensorComp->GetEigenvectorsFromTensor(tensors);
+
+			float angles[3];
+			angles[0] = eigenvectors[0].Dot(currentDir);
+			angles[1] = eigenvectors[1].Dot(currentDir);
+			angles[2] = eigenvectors[2].Dot(currentDir);
+
+			//find next direction = eigenvector with smallest angle
+			float smallestAngle = angles[0];
+			vtkVector3d v_n = eigenvectors[0];
+			for (int i = 1; i < 3; i++){
+				if (angles[i] < smallestAngle){
+					smallestAngle = angles[i];
+					v_n = eigenvectors[i];
+				}
+			}
+			vtkVector3d v_nPlus1 = addVec(multiplyVec(v_n, f), multiplyVec(addVec(multiplyVec(currentDir, (1 - g)), multiplyVec(v_n, g)), (1 - f)));		//Tracking formula //Gives out next direction
+			currentDir = v_nPlus1;
+		}
+		else{
+			//?
+		}
+
+		// Add point and tangent vector to renderer
+		//HyperstreamBSplineRenderer.Append(currentPos, currentDir, streamlineID);
+
+		counter++;
+		//delete ...;
+	}
+	
+	
+	/////////////////////////////////////////
+	
+
+
+
+
 
 	vtkSmartPointer<vtkImageResample> resample = vtkSmartPointer<vtkImageResample>::New();
 	if (reductionFactor < 1.0)
@@ -414,59 +543,22 @@ int main(int argc, char *argv[])
 	return a.exec();
 }
 
-/*
-void TrackFibers(vtkVector3d startPoint, vtkSmartPointer<vtkImageData> input, vtkDenseArray<double> tensors){
 
-//Global/GUI Parameters
-float stepSize = 1;
-float f, g;
-
-vtkSmartPointer<vtkVector3d> currentPos = vtkSmartPointer<vtkVector3d>::New();
-vtkSmartPointer<vtkVector3d> currentDir = vtkSmartPointer<vtkVector3d>::New();		//= next step direction = incoming direction = V_n-1
-
-//Initialize
-currentPos->Set(startPoint.X, startPoint.Y, startPoint.Z);
-currentCell = input->FindCell(currentPos);
-vtkVector3d eigenvector1, eigenvector2, eigenvector3 = getEigenvectors(tensors);
-int random = rand() % 3 + 1;					// In the range 1 to 3	//Make vector-norm dependent!
-
-if (random == 1)
-currentDir = eigenvector1.Normalize;
-else if (random == 2)
-currentDir = eigenvector2.Normalize;
-else if (random == 3)
-currentDir = eigenvector3.Normalize;
-else
-ThrowError;
-
-
-
-while (ABBRUCHBED){
-
-//Perform step
-currentPos += currentDir.Normalize*stepSize;
-
-//Check if entering new voxel
-newCell = input->FindCell(currentPos);
-
-if (newCell.ID != currentCell.id){		//When entering new voxel
-//Determine next direction with smallest angle to incoming direction
-newTensors = newCell.Tensors;
-vtkVector3d newEigenvector1, newEigenvector2, newEigenvector3 = getEigenvectors(newTensors);
-float angle1 = eigenvector1.Dot(currentDir);
-float angle2 = eigenvector2.Dot(currentDir);
-float angle3 = eigenvector3.Dot(currentDir);
-vtkVector3d v_n = findSmallestAngle(angle1, angle2, angle3);
-
-vtkVector3d v_nPlus1 = f*v_n + (1 - f)((1 - g)currentDir + g*v_n);		//Tracking formula //Gives out next direction
-currentDir = v_nPlus1;
-}
-else{
-?
+//Custom Vector classes
+vtkVector3d addVec(vtkVector3d vec1, vtkVector3d vec2){
+	vtkVector3d returnVec;
+	returnVec.Set(vec1.GetX() + vec2.GetX(), vec1.GetY() + vec2.GetY(), vec1.GetZ() + vec2.GetZ());
+	return returnVec;
 }
 
-// Add point and tangent vector to renderer
-HyperstreamBSplineRenderer.Append(currentPos, currentDir, streamlineID);
+vtkVector3d substractVec(vtkVector3d vec1, vtkVector3d vec2){
+	vtkVector3d returnVec;
+	returnVec.Set(vec1.GetX() - vec2.GetX(), vec1.GetY() - vec2.GetY(), vec1.GetZ() - vec2.GetZ());
+	return returnVec;
 }
 
-}*/
+vtkVector3d multiplyVec(vtkVector3d vec1, double scalar){
+	vtkVector3d returnVec;
+	returnVec.Set(vec1.GetX() *scalar, vec1.GetY() *scalar, vec1.GetZ() *scalar);
+	return returnVec;
+}
