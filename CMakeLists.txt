@@ -34,6 +34,8 @@ src/Rendering/BoxView.h
 src/GUI/ui_mainwindow.h
 src/GUI/FileMenu.h
 src/GUI/FileMenu.cpp
+src/GUI/Connector.h
+src/GUI/Connector.cpp
 src/TensorComputations/TensorComputations.cpp
 src/TensorComputations/TensorComputations.h
 ${FORMS_HEADERS})

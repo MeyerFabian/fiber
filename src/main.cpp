@@ -109,6 +109,7 @@ int main(int argc, char *argv[])
 	Ui::MainWindow* uimw = new Ui::MainWindow();
 	uimw->setupUi(&mainWindow);
 
+	// Enable Filebrowsing
 	FileMenu* filemenu = new FileMenu(&mainWindow);
 	QObject::connect(uimw->actionOpen, SIGNAL(triggered()), filemenu, SLOT(open()));
 
