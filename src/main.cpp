@@ -116,7 +116,8 @@ int main(int argc, char *argv[])
 	
 	// Enable Filebrowsing
 	Connector* conn = new Connector(&mainWindow,uimw);
-	conn->addFileMenu();
+	FileMenu fm = FileMenu(&mainWindow);
+	conn->addFileMenu(&fm);
 
 	QVTKWrapper* window1 = new QVTKWrapper(uimw->qvtkwidget);
 	// Parse the parameters

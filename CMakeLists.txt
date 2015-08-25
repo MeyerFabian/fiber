@@ -23,6 +23,7 @@ QT5_WRAP_UI(FORMS_HEADERS ${FORMS})
 
 add_executable(fiber
 src/main.cpp
+
 src/Rendering/QVTKWrapper.cpp
 src/Rendering/QVTKWrapper.h
 src/Rendering/ImagePlaneView.cpp
@@ -31,11 +32,13 @@ src/Rendering/View.h
 src/Rendering/View.cpp
 src/Rendering/BoxView.cpp
 src/Rendering/BoxView.h
+
 src/GUI/ui_mainwindow.h
 src/GUI/FileMenu.h
 src/GUI/FileMenu.cpp
 src/GUI/Connector.h
 src/GUI/Connector.cpp
+
 src/TensorComputations/TensorComputations.cpp
 src/TensorComputations/TensorComputations.h
 ${FORMS_HEADERS})

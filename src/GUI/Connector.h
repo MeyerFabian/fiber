@@ -10,7 +10,7 @@ class Connector
 public:
 	Connector(QMainWindow*, Ui::MainWindow* uimw);
 	~Connector();
-	bool addFileMenu();
+	bool addFileMenu(FileMenu* fm);
 private:
 	QMainWindow* window;
 	Ui::MainWindow* uimw;

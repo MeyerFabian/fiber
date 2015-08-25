@@ -7,6 +7,8 @@
 #include "QVTKWidget.h"
 #include "vtkInteractorStyleTrackballCamera.h"
 #include "View.h"
+
+enum ViewMode{IMAGEPLANE,BOX};
 class QVTKWrapper
 {
 public:
@@ -20,6 +22,10 @@ public:
     void render();
     View* getView();
     void setView(View* view);
+
+	void QVTKWrapper::switchToBoxView();
+	void QVTKWrapper::switchToImagePlaneView();
+
 protected:
     vtkSmartPointer<vtkRenderer> renderer;
     vtkSmartPointer<vtkRenderWindow> renWin;
@@ -27,7 +33,7 @@ protected:
     vtkSmartPointer<vtkInteractorStyle> istyle;
     QVTKWidget* qvtkwidget;
     View* view = NULL;
-
+	ViewMode activeView = IMAGEPLANE;
 };
 
 #endif // QVTKWRAPPER_H

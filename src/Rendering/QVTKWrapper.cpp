@@ -51,3 +51,11 @@ void QVTKWrapper::setView(View* v){
 View* QVTKWrapper::getView(){
     return this->view;
 }
+
+void QVTKWrapper::switchToBoxView(){
+
+}
+
+void QVTKWrapper::switchToImagePlaneView(){
+
+}
