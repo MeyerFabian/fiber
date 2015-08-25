@@ -1,19 +1,21 @@
-#ifndef FILEMENU_H
-#define FILEMENU_H
-#include <qobject.h>
+#ifndef CONNECTOR_H
+#define CONNECTOR_H
 #include <qfiledialog.h>
-#include <qmessagebox.h>
 #include <qmainwindow.h>
-class FileMenu :public QObject
+#include "FileMenu.h"
+#include "ui_mainwindow.h"
+#include <vector>
+class Connector 
 {
-	Q_OBJECT
 public:
-	FileMenu(QMainWindow*);
-	~FileMenu();
-public slots:
-	void open();
+	Connector(QMainWindow*, Ui::MainWindow* uimw);
+	~Connector();
+	bool addFileMenu();
 private:
 	QMainWindow* window;
+	Ui::MainWindow* uimw;
+	std::vector<QObject*> connectionTargets;
+
 };
 
-#endif // FILEMENU_H
+#endif // CONNECTOR_H

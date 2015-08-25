@@ -1,14 +1,19 @@
-#include "filemenu.h"
-#include <iostream>
+#include "connector.h"
 
-FileMenu::FileMenu(QMainWindow* window)
+Connector::Connector(QMainWindow* window, Ui::MainWindow* uimw)
 {
 	this->window = window;
-}
-FileMenu::~FileMenu(){
+	this->uimw = uimw;
 
 }
-void FileMenu::open(){
-	QString filename = QFileDialog::getOpenFileName(window, tr("Open File"), "","NIFTI-Image (*.nii.gz)");
-	QMessageBox::information(window, tr("File Name"), filename);
+Connector::~Connector(){
+	for (int i = 0; i < connectionTargets.size(); i++){
+		delete connectionTargets[i];
+	}
+}
+bool Connector::addFileMenu(){
+	FileMenu* fm = new FileMenu(window);
+	connectionTargets.push_back(fm);
+	return QObject::connect(uimw->actionOpen, SIGNAL(triggered()), fm, SLOT(open()));
+	
 }

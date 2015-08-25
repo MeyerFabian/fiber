@@ -1,5 +1,4 @@
 #include "filemenu.h"
-#include <iostream>
 
 FileMenu::FileMenu(QMainWindow* window)
 {

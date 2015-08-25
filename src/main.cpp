@@ -50,7 +50,7 @@
 #include <QMainWindow>
 
 #include "GUI/ui_mainwindow.h"
-#include "GUI/FileMenu.h"
+#include "GUI/Connector.h"
 
 #include "Rendering/QVTKWrapper.h"
 #include "Rendering/ImagePlaneView.h"
@@ -113,10 +113,10 @@ int main(int argc, char *argv[])
 	QMainWindow mainWindow;
 	Ui::MainWindow* uimw = new Ui::MainWindow();
 	uimw->setupUi(&mainWindow);
-
+	
 	// Enable Filebrowsing
-	FileMenu* filemenu = new FileMenu(&mainWindow);
-	QObject::connect(uimw->actionOpen, SIGNAL(triggered()), filemenu, SLOT(open()));
+	Connector* conn = new Connector(&mainWindow,uimw);
+	conn->addFileMenu();
 
 	QVTKWrapper* window1 = new QVTKWrapper(uimw->qvtkwidget);
 	// Parse the parameters
@@ -266,7 +266,7 @@ int main(int argc, char *argv[])
 	//////////////////////////////////////////
 	// FIBERTRACKING MAINPART ////////////////
 	//////////////////////////////////////////
-
+	/*
 	//#Valle: Get tensors from data
 	tensorComp = new TensorComputations();
 
@@ -390,7 +390,7 @@ int main(int argc, char *argv[])
 	
 	
 	/////////////////////////////////////////
-	
+	*/
 
 
 
@@ -549,7 +549,7 @@ int main(int argc, char *argv[])
 	delete window1;
 	delete view1;
 	delete tensorComp;
-	delete filemenu;
+	delete conn;
 }
 
 
