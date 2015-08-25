@@ -1,6 +1,4 @@
 
-#include <QMainWindow>
-#include "GUI/ui_mainwindow.h"
 /*=========================================================================
 
   Program:   Visualization Toolkit
@@ -49,6 +47,11 @@
 #include "vtkPointLocator.h"
 
 #include <QVTKWidget.h>
+#include <QMainWindow>
+
+#include "GUI/ui_mainwindow.h"
+#include "GUI/FileMenu.h"
+
 #include "Rendering/QVTKWrapper.h"
 #include "Rendering/ImagePlaneView.h"
 #include "Rendering/BoxView.h"
@@ -111,9 +114,11 @@ int main(int argc, char *argv[])
 	Ui::MainWindow* uimw = new Ui::MainWindow();
 	uimw->setupUi(&mainWindow);
 
+	FileMenu* filemenu = new FileMenu(&mainWindow);
+	QObject::connect(uimw->actionOpen, SIGNAL(triggered()), filemenu, SLOT(open()));
+
 	QVTKWrapper* window1 = new QVTKWrapper(uimw->qvtkwidget);
 	// Parse the parameters
-
 	int count = 1;
 	char *dirname = NULL;
 	double opacityWindow = 4096;
@@ -124,7 +129,7 @@ int main(int argc, char *argv[])
 	double frameRate = 10.0;
 	char *fileName = 0;
 	int fileType = 0;
-	int imageplane = 0;
+	int view = 1;
 
 	bool independentComponents = true;
 
@@ -145,12 +150,12 @@ int main(int argc, char *argv[])
 		}
 		else if (!strcmp(argv[count], "-Clip"))
 		{
-			clip = 1;
+			view = 2;
 			count++;
 		}
 		else if (!strcmp(argv[count], "-Imageplane"))
 		{
-			imageplane = 1;
+			view = 1;
 			count++;
 		}
 		else if (!strcmp(argv[count], "-MIP"))
@@ -408,7 +413,7 @@ int main(int argc, char *argv[])
 	// Add a box widget if the clip option was selected
 
 
-	if (clip)
+	if (view==2)
 	{
 		if (reductionFactor < 1.0)
 		{
@@ -422,7 +427,7 @@ int main(int argc, char *argv[])
 	}
 
 	// Add a Imageplane widget if the imageplane option was selected
-	if (imageplane)
+	if (view==1)
 	{
 		view1 = new ImagePlaneView(reader->GetOutputPort());
 		window1->setView(view1);
@@ -536,11 +541,14 @@ int main(int argc, char *argv[])
 	window1->render();
 	mainWindow.show();
 
+
+	
+	return a.exec(); 
 	delete uimw;
 	delete window1;
 	delete view1;
 	delete tensorComp;
-	return a.exec();
+	delete filemenu;
 }
 
 
