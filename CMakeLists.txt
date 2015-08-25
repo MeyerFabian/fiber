@@ -32,7 +32,8 @@ src/Rendering/View.h
 src/Rendering/View.cpp
 src/Rendering/BoxView.cpp
 src/Rendering/BoxView.h
-
+src/Rendering/ViewCreator.h
+src/Rendering/ViewCreator.cpp
 src/GUI/ui_mainwindow.h
 src/GUI/FileMenu.h
 src/GUI/FileMenu.cpp

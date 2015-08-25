@@ -55,6 +55,7 @@
 #include "Rendering/QVTKWrapper.h"
 #include "Rendering/ImagePlaneView.h"
 #include "Rendering/BoxView.h"
+#include "Rendering/ViewCreator.h"
 
 #define VTI_FILETYPE 1
 #define MHA_FILETYPE 2
@@ -413,8 +414,11 @@ int main(int argc, char *argv[])
 	View* view1 = NULL;
 
 	// Add a box widget if the clip option was selected
-
-
+	
+	
+	ViewCreator* vc =new ViewCreator();
+	vc->BoxViewSpecifier(reader->GetOutputPort(),mapper,volume);
+	vc->ImagePlaneViewSpecifier(reader->GetOutputPort());
 	if (view==2)
 	{
 		if (reductionFactor < 1.0)
@@ -551,6 +555,7 @@ int main(int argc, char *argv[])
 	delete view1;
 	delete tensorComp;
 	delete conn;
+	delete vc;
 }
 
 
