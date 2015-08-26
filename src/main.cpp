@@ -115,12 +115,12 @@ int main(int argc, char *argv[])
 	Ui::MainWindow* uimw = new Ui::MainWindow();
 	uimw->setupUi(&mainWindow);
 	
+
 	// Enable Filebrowsing
-	Connector* conn = new Connector(&mainWindow,uimw);
+	Connector* conn = new Connector(&mainWindow, uimw);
 	FileMenu fm = FileMenu(&mainWindow);
 	conn->addFileMenu(&fm);
 
-	QVTKWrapper* window1 = new QVTKWrapper(uimw->qvtkwidget);
 	// Parse the parameters
 	int count = 1;
 	char *dirname = NULL;
@@ -419,6 +419,12 @@ int main(int argc, char *argv[])
 	ViewCreator* vc =new ViewCreator();
 	vc->BoxViewSpecifier(reader->GetOutputPort(),mapper,volume);
 	vc->ImagePlaneViewSpecifier(reader->GetOutputPort());
+	QVTKWrapper* window1 = new QVTKWrapper(uimw->qvtkwidget, vc);
+
+	conn->addBoxView(window1);
+	conn->addImagePlaneView(window1);
+
+
 	if (view==2)
 	{
 		if (reductionFactor < 1.0)
@@ -544,7 +550,9 @@ int main(int argc, char *argv[])
 		vtkGenericWarningMacro("Unknown blend type.");
 		break;
 	}
+
 	window1->render();
+
 	mainWindow.show();
 
 

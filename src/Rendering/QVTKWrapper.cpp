@@ -1,6 +1,6 @@
 #include "QVTKWrapper.h"
 
-QVTKWrapper::QVTKWrapper(QVTKWidget* qvtk )
+QVTKWrapper::QVTKWrapper(QVTKWidget* qvtk ,ViewCreator* vc)
 {
     renderer = vtkSmartPointer<vtkRenderer>::New();
     renWin = vtkSmartPointer<vtkRenderWindow>::New();
@@ -10,6 +10,7 @@ QVTKWrapper::QVTKWrapper(QVTKWidget* qvtk )
     istyle = vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
     iren->SetInteractorStyle(istyle);
     this-> qvtkwidget =qvtk;
+	this->vc = vc;
 }
 
 QVTKWrapper::~QVTKWrapper(){
@@ -36,8 +37,9 @@ QVTKWidget* QVTKWrapper::GetQVTKWidget(){
 }
 void QVTKWrapper::render(){
     if(view != NULL){
-    view->setActive(this->renderer,this->iren);
-    }
+		view->activate(this->renderer,this->iren);
+	}
+	std::cout << "jk" << std::endl;
     renWin->AddRenderer(renderer);
     qvtkwidget->SetRenderWindow(renWin);
 
@@ -54,8 +56,20 @@ View* QVTKWrapper::getView(){
 
 void QVTKWrapper::switchToBoxView(){
 
+	view->deactivate(this->renderer);
+	
+	activeView = BOX;
+	setView(vc->createBoxView());
+	if (view != NULL){
+		view->activate(this->renderer, this->iren);
+	}
 }
 
 void QVTKWrapper::switchToImagePlaneView(){
-
+	view->deactivate(this->renderer);
+	activeView = IMAGEPLANE;
+	setView(vc->createImagePlaneView());
+	if (view != NULL){
+		view->activate(this->renderer, this->iren);
+	}
 }

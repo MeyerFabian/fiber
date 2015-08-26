@@ -23,12 +23,18 @@ ImagePlaneView::ImagePlaneView(vtkSmartPointer<vtkAlgorithmOutput> alg):
 ImagePlaneView::~ImagePlaneView(){
 }
 
-void ImagePlaneView::setActive(vtkSmartPointer<vtkRenderer> renderer, vtkSmartPointer<vtkRenderWindowInteractor> rendint){
+void ImagePlaneView::activate(vtkSmartPointer<vtkRenderer> renderer, vtkSmartPointer<vtkRenderWindowInteractor> rendint){
     for(int i = 0; i<length; i++){
     iplane[i]->SetInteractor(rendint);
     iplane[i]->SetDefaultRenderer(renderer);
     iplane[i]->On();
     }
+}
+
+void ImagePlaneView::deactivate(vtkSmartPointer<vtkRenderer> renderer){
+	for (int i = 0; i<length; i++){
+		iplane[i]->Off();
+	}
 }
 
 /*

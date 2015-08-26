@@ -22,8 +22,9 @@ public:
 protected:
     vtkSmartPointer<vtkImagePlaneWidget> iplane[3];
     const int length = 3;
-    void setActive(vtkSmartPointer<vtkRenderer> renderer, vtkSmartPointer<vtkRenderWindowInteractor> rendint);
-    /*
+    void activate(vtkSmartPointer<vtkRenderer> renderer, vtkSmartPointer<vtkRenderWindowInteractor> rendint);
+	void deactivate(vtkSmartPointer<vtkRenderer> renderer);
+	/*
     vtkSmartPointer<vtkRenderWindowInteractor> rwi;
     vtkSmartPointer<vtkAlgorithmOutput> ao;
     vtkSmartPointer<vtkRenderer> renderer;

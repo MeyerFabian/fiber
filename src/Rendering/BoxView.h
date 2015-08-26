@@ -22,7 +22,8 @@ public:
 
 protected:
     vtkSmartPointer<vtkBoxWidget> box = vtkSmartPointer<vtkBoxWidget>::New();
-    void setActive(vtkSmartPointer<vtkRenderer> renderer, vtkSmartPointer<vtkRenderWindowInteractor> rendint);
+    void activate(vtkSmartPointer<vtkRenderer> renderer, vtkSmartPointer<vtkRenderWindowInteractor> rendint);
+	void deactivate(vtkSmartPointer<vtkRenderer> renderer);
 private:
     vtkSmartPointer<vtkProp> prop;
 

@@ -9,7 +9,8 @@ class View
 public:
     View();
     ~View();
-    virtual void setActive(vtkSmartPointer<vtkRenderer> renderer, vtkSmartPointer<vtkRenderWindowInteractor> rendint){}
+    virtual void activate(vtkSmartPointer<vtkRenderer> renderer, vtkSmartPointer<vtkRenderWindowInteractor> rendint){}
+	virtual void deactivate(vtkSmartPointer<vtkRenderer> renderer){}
 };
 
 #endif // VIEW_H
