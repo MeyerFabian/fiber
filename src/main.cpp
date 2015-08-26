@@ -423,7 +423,7 @@ int main(int argc, char *argv[])
 	{
 		if (reductionFactor < 1.0)
 		{
-			view1 = new BoxView(resample->GetOutputPort(), mapper, volume);
+            view1 = vc->createBoxView();
 		}
 		else
 		{
@@ -435,7 +435,7 @@ int main(int argc, char *argv[])
 	// Add a Imageplane widget if the imageplane option was selected
 	if (view==1)
 	{
-		view1 = new ImagePlaneView(reader->GetOutputPort());
+        view1 = vc->createImagePlaneView();
 		window1->setView(view1);
 
 
