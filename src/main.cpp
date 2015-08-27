@@ -57,6 +57,8 @@
 #include "Rendering/BoxView.h"
 #include "Rendering/ViewCreator.h"
 
+#include "Data/ImageReaderWrapper.h"
+
 #define VTI_FILETYPE 1
 #define MHA_FILETYPE 2
 #define NIFTI_FILETYPE 3
@@ -116,16 +118,11 @@ int main(int argc, char *argv[])
 	uimw->setupUi(&mainWindow);
 	
 
-	// Enable Filebrowsing
-	Connector* conn = new Connector(&mainWindow, uimw);
-	FileMenu fm = FileMenu(&mainWindow);
-	conn->addFileMenu(&fm);
-
 	// Parse the parameters
 	int count = 1;
 	char *dirname = NULL;
-	double opacityWindow = 4096;
-	double opacityLevel = 2048;
+	double opacityWindow = 0.02;
+	double opacityLevel = 0.01;
 	int blendType = 0;
 	int clip = 0;
 	double reductionFactor = 1.0;
@@ -143,23 +140,12 @@ int main(int argc, char *argv[])
 			PrintUsage();
 			exit(EXIT_SUCCESS);
 		}
-
 		else if (!strcmp(argv[count], "-NIFTI"))
 		{
 			fileName = new char[strlen(argv[count + 1]) + 1];
 			fileType = NIFTI_FILETYPE;
 			sprintf(fileName, "%s", argv[count + 1]);
 			count += 2;
-		}
-		else if (!strcmp(argv[count], "-Clip"))
-		{
-			view = 2;
-			count++;
-		}
-		else if (!strcmp(argv[count], "-Imageplane"))
-		{
-			view = 1;
-			count++;
 		}
 		else if (!strcmp(argv[count], "-MIP"))
 		{
@@ -214,30 +200,25 @@ int main(int argc, char *argv[])
 			independentComponents = false;
 			count += 1;
 		}
-		else
-		{
-			cout << "Unrecognized option: " << argv[count] << endl;
-			cout << endl;
-			PrintUsage();
-			exit(EXIT_FAILURE);
-		}
 	}
 
-	if (!dirname && !fileName)
-	{
-		cout << "Error: you must specify a directory of DICOM data or a .vti file or a .mha!" << endl;
-		cout << endl;
-		PrintUsage();
-		exit(EXIT_FAILURE);
-	}
 
 	// Read the data
 	vtkSmartPointer<vtkImageReader2> reader = 0;
 	vtkSmartPointer<vtkImageData> input = 0;
+	vtkSmartPointer<vtkNIFTIImageReader> niftreader = vtkSmartPointer<vtkNIFTIImageReader>::New();
 
-	TensorComputations* tensorComp = NULL;
+
+
+	// Enable Filebrowsing
+	Connector* conn = new Connector(&mainWindow, uimw);
+	FileMenu fm = FileMenu(&mainWindow);
+
+	ImageReaderWrapper* iw = new ImageReaderWrapper(niftreader);
+
+	conn->addFileReader(&fm, iw);
+
 	if (fileType == NIFTI_FILETYPE){
-		vtkSmartPointer<vtkNIFTIImageReader> niftreader = vtkSmartPointer<vtkNIFTIImageReader>::New();
 		niftreader->SetFileName(fileName);
 
 		reader = niftreader;
@@ -245,11 +226,6 @@ int main(int argc, char *argv[])
 		input = reader->GetOutput();
 
 		reader = niftreader;
-	}
-	else
-	{
-		cout << "Error! Not NII!" << endl;
-		exit(EXIT_FAILURE);
 	}
 	int dim[3];
 	input->GetDimensions(dim);
@@ -265,11 +241,14 @@ int main(int argc, char *argv[])
 	}
 
 
+	TensorComputations* tensorComp = NULL;
 	//////////////////////////////////////////
 	// FIBERTRACKING MAINPART ////////////////
 	//////////////////////////////////////////
 	/*
 	//#Valle: Get tensors from data
+
+
 	tensorComp = new TensorComputations();
 
 	for (int z = 0; z < dim[2]; z++)
@@ -564,6 +543,7 @@ int main(int argc, char *argv[])
 	delete tensorComp;
 	delete conn;
 	delete vc;
+	delete iw;
 }
 
 

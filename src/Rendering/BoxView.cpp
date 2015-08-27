@@ -51,14 +51,14 @@ BoxView::~BoxView(){
 
 void BoxView::activate(vtkSmartPointer<vtkRenderer> renderer, vtkSmartPointer<vtkRenderWindowInteractor> rendint){
 
+	renderer->AddVolume(prop);
     box->SetInteractor(rendint);
     box->SetDefaultRenderer(renderer);
 
     box->EnabledOn();
-    renderer->AddVolume(prop);
 }
 void BoxView::deactivate(vtkSmartPointer<vtkRenderer> renderer){
-	box->EnabledOff();
 	renderer->RemoveAllViewProps();
+	box->EnabledOff();
 	
 }

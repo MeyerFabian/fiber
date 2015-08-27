@@ -8,6 +8,9 @@ FileMenu::~FileMenu(){
 
 }
 void FileMenu::open(){
-	QString filename = QFileDialog::getOpenFileName(window, tr("Open File"), "","NIFTI-Image (*.nii.gz)");
-	QMessageBox::information(window, tr("File Name"), filename);
+	QString string = QFileDialog::getOpenFileName(window, tr("Open File"), "","NIFTI-Image (*.nii.gz)");
+	
+	QByteArray array = string.toLocal8Bit();
+	char* filename = array.data();
+	emit FileNameChanged(filename);
 }

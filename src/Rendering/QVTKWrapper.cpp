@@ -55,9 +55,9 @@ View* QVTKWrapper::getView(){
 }
 
 void QVTKWrapper::switchToBoxView(){
-
+	//CAN BE DONE WAY MORE EFFICIENT BY STORING PREVIOUS VIEWS, MIGHT CONSIDER DOING IT LATER ON
 	view->deactivate(this->renderer);
-	
+	delete view;
 	activeView = BOX;
 	setView(vc->createBoxView());
 	if (view != NULL){
@@ -66,7 +66,9 @@ void QVTKWrapper::switchToBoxView(){
 }
 
 void QVTKWrapper::switchToImagePlaneView(){
+	//CAN BE DONE WAY MORE EFFICIENT BY STORING PREVIOUS VIEWS, MIGHT CONSIDER DOING IT LATER ON
 	view->deactivate(this->renderer);
+	delete view;
 	activeView = IMAGEPLANE;
 	setView(vc->createImagePlaneView());
 	if (view != NULL){

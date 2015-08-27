@@ -9,9 +9,10 @@ Connector::Connector(QMainWindow* window, Ui::MainWindow* uimw)
 Connector::~Connector(){
 
 }
-bool Connector::addFileMenu(FileMenu* fm){
-	return QObject::connect(uimw->actionOpen, SIGNAL(triggered()), fm, SLOT(open()));
-	
+bool Connector::addFileReader(FileMenu* fm,ImageReaderWrapper* iw){
+	bool q1 = QObject::connect(uimw->actionOpen, SIGNAL(triggered()), fm, SLOT(open()));
+	bool q2 = QObject::connect(fm, SIGNAL(FileNameChanged(char*)), iw, SLOT(setFileName(char*)));
+	return q1 && q2;
 }
 
 bool Connector::addBoxView(QVTKWrapper* qvtk){
@@ -20,5 +21,4 @@ bool Connector::addBoxView(QVTKWrapper* qvtk){
 
 bool Connector::addImagePlaneView(QVTKWrapper* qvtk){
 	return QObject::connect(uimw->actionImageplane, SIGNAL(triggered()), qvtk, SLOT(switchToImagePlaneView()));
-
 }

@@ -12,6 +12,8 @@ public:
 	~FileMenu();
 public slots:
 	void open();
+signals:
+	void FileNameChanged(char*);
 private:
 	QMainWindow* window;
 };
