@@ -11,6 +11,5 @@ void ImageReaderWrapper::setFileName(char* filename){
 	reader->SetFileName(filename);
 
 	reader->Update();
-	std::cout << "we reach this" << std::endl;
-
+	emit initRenderer(reader);
 }

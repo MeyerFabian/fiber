@@ -7,6 +7,8 @@
 #include "../Data/ImageReaderWrapper.h"
 #include <vector>
 #include "../Rendering/QVTKWrapper.h"
+#include "../WindowHandler.h"
+class WindowHandler;
 class Connector 
 {
 public:
@@ -15,7 +17,7 @@ public:
 	bool addFileReader(FileMenu* fm, ImageReaderWrapper* iw);
 	bool addBoxView(QVTKWrapper* qvtk);
 	bool addImagePlaneView(QVTKWrapper* qvtk);
-
+	bool addWindowHandler(ImageReaderWrapper* iw, WindowHandler* wh);
 private:
 	QMainWindow* window;
 	Ui::MainWindow* uimw;

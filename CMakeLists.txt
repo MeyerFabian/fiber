@@ -41,6 +41,8 @@ src/GUI/Connector.h
 src/GUI/Connector.cpp
 src/Data/ImageReaderWrapper.h
 src/Data/ImageReaderWrapper.cpp
+src/Windowhandler.h
+src/Windowhandler.cpp
 src/TensorComputations/TensorComputations.cpp
 src/TensorComputations/TensorComputations.h
 ${FORMS_HEADERS})

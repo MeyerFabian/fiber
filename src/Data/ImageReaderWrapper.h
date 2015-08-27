@@ -11,6 +11,8 @@ public:
 	~ImageReaderWrapper();
 public slots:
 	void setFileName(char* filename);
+signals:
+	void initRenderer(vtkSmartPointer<vtkImageReader2> reader);
 private:
 	vtkSmartPointer<vtkImageReader2> reader;
 };

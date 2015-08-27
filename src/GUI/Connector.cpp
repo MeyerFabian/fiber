@@ -22,3 +22,6 @@ bool Connector::addBoxView(QVTKWrapper* qvtk){
 bool Connector::addImagePlaneView(QVTKWrapper* qvtk){
 	return QObject::connect(uimw->actionImageplane, SIGNAL(triggered()), qvtk, SLOT(switchToImagePlaneView()));
 }
+bool Connector::addWindowHandler(ImageReaderWrapper* iw, WindowHandler* wh){
+	return QObject::connect(iw, SIGNAL(initRenderer(vtkSmartPointer<vtkImageReader2>)), wh, SLOT(init(vtkSmartPointer<vtkImageReader2>)));
+}
