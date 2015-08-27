@@ -10,7 +10,10 @@ WindowHandler::WindowHandler(int argc, char *argv[], Connector* conn, Ui::MainWi
 	}
 }
 WindowHandler::~WindowHandler(){
-
+	delete view1;
+	delete vc;
+	delete window1;
+	delete tensorComp;
 }
 void WindowHandler::init(vtkSmartPointer<vtkImageReader2> reader){
 
@@ -112,7 +115,6 @@ void WindowHandler::init(vtkSmartPointer<vtkImageReader2> reader){
 	}
 	
 	
-	TensorComputations* tensorComp = NULL;
 	//////////////////////////////////////////
 	// FIBERTRACKING MAINPART ////////////////
 	//////////////////////////////////////////
@@ -261,15 +263,14 @@ void WindowHandler::init(vtkSmartPointer<vtkImageReader2> reader){
 	vtkSmartPointer<vtkVolume> volume = vtkSmartPointer<vtkVolume>::New();
 	vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
 
-	View* view1 = NULL;
 
 	// Add a box widget if the clip option was selected
 
 
-	ViewCreator* vc = new ViewCreator();
+	vc = new ViewCreator();
 	vc->BoxViewSpecifier(reader->GetOutputPort(), mapper, volume);
 	vc->ImagePlaneViewSpecifier(reader->GetOutputPort());
-	QVTKWrapper* window1 = new QVTKWrapper(uimw->qvtkwidget, vc);
+	window1 = new QVTKWrapper(uimw->qvtkwidget, vc);
 
 	conn->addBoxView(window1);
 	conn->addImagePlaneView(window1);
@@ -402,9 +403,7 @@ void WindowHandler::init(vtkSmartPointer<vtkImageReader2> reader){
 	}
 
 	window1->render();
-	
 
-	
 }
 
 //Custom Vector classes

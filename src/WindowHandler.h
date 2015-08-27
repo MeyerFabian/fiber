@@ -87,7 +87,11 @@ private:
 	Ui::MainWindow* uimw;
 	Connector* conn;
 	int argc;
-	char *argv[];
+	View* view1;
+	ViewCreator* vc;
+	QVTKWrapper* window1;
+	TensorComputations* tensorComp;
+	char* argv[];
 };
 
 #endif // WINDOWHANDLER_H
