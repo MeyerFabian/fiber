@@ -24,6 +24,7 @@
 #include "QVTKWidget.h"
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QWidget>
+#include <QtWidgets/QActionGroup>
 
 QT_BEGIN_NAMESPACE
 
@@ -37,6 +38,7 @@ public:
     QAction *actionImageplane;
     QAction *actionBox;
     QAction *actionShow_On_off;
+    QActionGroup *viewGroup;
     QWidget *centralwidget;
     QHBoxLayout *horizontalLayout;
     QGridLayout *gridLayout;
@@ -65,13 +67,15 @@ public:
         actionAnterior = new QAction(MainWindow);
         actionAnterior->setObjectName(QStringLiteral("actionAnterior"));
         actionImageplane = new QAction(MainWindow);
-        actionImageplane->setObjectName(QStringLiteral("actionImageplane"));
-        actionImageplane->setCheckable(true);
-        actionImageplane->setChecked(false);
-        actionBox = new QAction(MainWindow);
-        actionBox->setObjectName(QStringLiteral("actionBox"));
-        actionBox->setCheckable(true);
-        actionBox->setChecked(true);
+		actionImageplane->setObjectName(QStringLiteral("actionImageplane"));
+		actionImageplane->setCheckable(true);
+		actionBox = new QAction(MainWindow);
+		actionBox->setObjectName(QStringLiteral("actionBox"));
+		actionBox->setCheckable(true);
+		viewGroup = new QActionGroup(MainWindow);
+        viewGroup->addAction(actionImageplane);
+        viewGroup->addAction(actionBox);
+        actionImageplane->setChecked(true);
         actionShow_On_off = new QAction(MainWindow);
         actionShow_On_off->setObjectName(QStringLiteral("actionShow_On_off"));
         actionShow_On_off->setCheckable(true);

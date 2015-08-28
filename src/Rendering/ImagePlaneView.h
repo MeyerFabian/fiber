@@ -11,7 +11,7 @@
 class ImagePlaneView : public View
 {
 public:
-    ImagePlaneView(vtkSmartPointer<vtkAlgorithmOutput> alg);
+    ImagePlaneView(vtkSmartPointer<vtkAlgorithmOutput> alg, int dim[3]);
     ~ImagePlaneView();
     /*
     vtkSmartPointer<vtkRenderWindowInteractor> GetRenderWindowInteractor();

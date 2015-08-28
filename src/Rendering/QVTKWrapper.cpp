@@ -39,7 +39,6 @@ void QVTKWrapper::render(){
     if(view != NULL){
 		view->activate(this->renderer,this->iren);
 	}
-	std::cout << "jk" << std::endl;
     renWin->AddRenderer(renderer);
     qvtkwidget->SetRenderWindow(renWin);
 
