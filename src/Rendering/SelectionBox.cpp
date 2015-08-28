@@ -34,7 +34,7 @@ SelectionBox::~SelectionBox(){
 void SelectionBox::activate(vtkSmartPointer<vtkRenderer> renderer, vtkSmartPointer<vtkRenderWindowInteractor> rendint){
 
 	box->SetPriority(5.0);
-	box->PlaceWidget(90, 100, 70, 80, 70, 80);
+        box->PlaceWidget(68.5, 78.5, 116.5, 126.5, 77, 87);
 	box->HandlesOff();
 	box->SetRotationEnabled(0);
 	box->OutlineCursorWiresOff();
