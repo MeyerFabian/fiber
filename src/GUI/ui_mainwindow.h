@@ -1,5 +1,5 @@
 /********************************************************************************
-** Form generated from reading UI file 'MainWindow.ui'
+** Form generated from reading UI file 'Mainwindow.ui'
 **
 ** Created by: Qt User Interface Compiler version 5.5.0
 **
@@ -14,17 +14,18 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QGridLayout>
-#include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
-#include <QtWidgets/QListView>
 #include <QtWidgets/QListWidget>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
 #include "QVTKWidget.h"
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QSlider>
 #include <QtWidgets/QStatusBar>
+#include <QtWidgets/QTabWidget>
+#include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
-#include <QtWidgets/QActionGroup>
 
 QT_BEGIN_NAMESPACE
 
@@ -38,19 +39,25 @@ public:
     QAction *actionImageplane;
     QAction *actionBox;
     QAction *actionShow_On_off;
-    QActionGroup *viewGroup;
     QWidget *centralwidget;
-    QHBoxLayout *horizontalLayout;
-    QGridLayout *gridLayout;
+    QVBoxLayout *verticalLayout_2;
+	QGridLayout *gridLayout;
 	QVTKWidget *qvtkwidget;
     QListWidget *listWidget_2;
     QListWidget *listWidget;
-    QListView *listView;
+    QTabWidget *tabWidget;
+    QWidget *tab;
+    QVBoxLayout *verticalLayout;
+    QSlider *horizontalSlider;
+    QWidget *tab_2;
+    QVBoxLayout *verticalLayout_3;
+    QPushButton *pushButton;
     QMenuBar *menubar;
     QMenu *menuFile;
     QMenu *menuView;
     QMenu *menuWidget;
-    QStatusBar *statusbar;
+	QStatusBar *statusbar;
+	QActionGroup *viewGroup;
 
     void setupUi(QMainWindow *MainWindow)
     {
@@ -66,20 +73,20 @@ public:
         actionSuperior->setObjectName(QStringLiteral("actionSuperior"));
         actionAnterior = new QAction(MainWindow);
         actionAnterior->setObjectName(QStringLiteral("actionAnterior"));
-        actionImageplane = new QAction(MainWindow);
+		actionImageplane = new QAction(MainWindow);
 		actionImageplane->setObjectName(QStringLiteral("actionImageplane"));
 		actionImageplane->setCheckable(true);
 		actionBox = new QAction(MainWindow);
 		actionBox->setObjectName(QStringLiteral("actionBox"));
 		actionBox->setCheckable(true);
 		viewGroup = new QActionGroup(MainWindow);
-        viewGroup->addAction(actionImageplane);
-        viewGroup->addAction(actionBox);
-        actionImageplane->setChecked(true);
+		viewGroup->addAction(actionImageplane);
+		viewGroup->addAction(actionBox);
         actionShow_On_off = new QAction(MainWindow);
         actionShow_On_off->setObjectName(QStringLiteral("actionShow_On_off"));
         actionShow_On_off->setCheckable(true);
-        actionShow_On_off->setChecked(true);
+		actionShow_On_off->setChecked(true);
+		actionImageplane->setChecked(true);
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName(QStringLiteral("centralwidget"));
         centralwidget->setEnabled(true);
@@ -90,12 +97,12 @@ public:
         centralwidget->setSizePolicy(sizePolicy);
         centralwidget->setMinimumSize(QSize(1024, 748));
         centralwidget->setSizeIncrement(QSize(4, 3));
-        horizontalLayout = new QHBoxLayout(centralwidget);
-        horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
+        verticalLayout_2 = new QVBoxLayout(centralwidget);
+        verticalLayout_2->setObjectName(QStringLiteral("verticalLayout_2"));
         gridLayout = new QGridLayout();
         gridLayout->setObjectName(QStringLiteral("gridLayout"));
-        qvtkwidget = new QVTKWidget(centralwidget);
-                qvtkwidget->setObjectName(QStringLiteral("qvtkwidget"));
+		qvtkwidget = new QVTKWidget(centralwidget);
+		qvtkwidget->setObjectName(QStringLiteral("qvtkwidget"));
         QSizePolicy sizePolicy1(QSizePolicy::Expanding, QSizePolicy::Expanding);
         sizePolicy1.setHorizontalStretch(0);
         sizePolicy1.setVerticalStretch(0);
@@ -103,32 +110,59 @@ public:
 		qvtkwidget->setSizePolicy(sizePolicy1);
 		qvtkwidget->setMinimumSize(QSize(640, 480));
 
-		gridLayout->addWidget(qvtkwidget, 0, 4, 2, 1);
+		gridLayout->addWidget(qvtkwidget, 0, 3, 2, 1);
 
         listWidget_2 = new QListWidget(centralwidget);
         listWidget_2->setObjectName(QStringLiteral("listWidget_2"));
-        sizePolicy.setHeightForWidth(listWidget_2->sizePolicy().hasHeightForWidth());
-        listWidget_2->setSizePolicy(sizePolicy);
+        QSizePolicy sizePolicy2(QSizePolicy::Preferred, QSizePolicy::Expanding);
+        sizePolicy2.setHorizontalStretch(0);
+        sizePolicy2.setVerticalStretch(0);
+        sizePolicy2.setHeightForWidth(listWidget_2->sizePolicy().hasHeightForWidth());
+        listWidget_2->setSizePolicy(sizePolicy2);
 
-        gridLayout->addWidget(listWidget_2, 1, 0, 1, 3);
+        gridLayout->addWidget(listWidget_2, 0, 1, 1, 1);
 
         listWidget = new QListWidget(centralwidget);
         listWidget->setObjectName(QStringLiteral("listWidget"));
-        sizePolicy.setHeightForWidth(listWidget->sizePolicy().hasHeightForWidth());
-        listWidget->setSizePolicy(sizePolicy);
-        listWidget->setSelectionRectVisible(false);
+        sizePolicy2.setHeightForWidth(listWidget->sizePolicy().hasHeightForWidth());
+        listWidget->setSizePolicy(sizePolicy2);
 
-        gridLayout->addWidget(listWidget, 0, 0, 1, 1);
+        gridLayout->addWidget(listWidget, 1, 1, 1, 1);
 
-        listView = new QListView(centralwidget);
-        listView->setObjectName(QStringLiteral("listView"));
-        sizePolicy.setHeightForWidth(listView->sizePolicy().hasHeightForWidth());
-        listView->setSizePolicy(sizePolicy);
+        tabWidget = new QTabWidget(centralwidget);
+        tabWidget->setObjectName(QStringLiteral("tabWidget"));
+        QSizePolicy sizePolicy3(QSizePolicy::Fixed, QSizePolicy::Preferred);
+        sizePolicy3.setHorizontalStretch(0);
+        sizePolicy3.setVerticalStretch(0);
+        sizePolicy3.setHeightForWidth(tabWidget->sizePolicy().hasHeightForWidth());
+        tabWidget->setSizePolicy(sizePolicy3);
+        tabWidget->setMinimumSize(QSize(200, 0));
+        tab = new QWidget();
+        tab->setObjectName(QStringLiteral("tab"));
+        verticalLayout = new QVBoxLayout(tab);
+        verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
+        horizontalSlider = new QSlider(tab);
+        horizontalSlider->setObjectName(QStringLiteral("horizontalSlider"));
+        horizontalSlider->setOrientation(Qt::Horizontal);
 
-        gridLayout->addWidget(listView, 0, 2, 1, 1);
+        verticalLayout->addWidget(horizontalSlider);
+
+        tabWidget->addTab(tab, QString());
+        tab_2 = new QWidget();
+        tab_2->setObjectName(QStringLiteral("tab_2"));
+        verticalLayout_3 = new QVBoxLayout(tab_2);
+        verticalLayout_3->setObjectName(QStringLiteral("verticalLayout_3"));
+        pushButton = new QPushButton(tab_2);
+        pushButton->setObjectName(QStringLiteral("pushButton"));
+
+        verticalLayout_3->addWidget(pushButton);
+
+        tabWidget->addTab(tab_2, QString());
+
+        gridLayout->addWidget(tabWidget, 0, 2, 2, 1);
 
 
-        horizontalLayout->addLayout(gridLayout);
+        verticalLayout_2->addLayout(gridLayout);
 
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
@@ -157,6 +191,9 @@ public:
 
         retranslateUi(MainWindow);
 
+        tabWidget->setCurrentIndex(1);
+
+
         QMetaObject::connectSlotsByName(MainWindow);
     } // setupUi
 
@@ -170,6 +207,9 @@ public:
         actionImageplane->setText(QApplication::translate("MainWindow", "Imageplane", 0));
         actionBox->setText(QApplication::translate("MainWindow", "Box", 0));
         actionShow_On_off->setText(QApplication::translate("MainWindow", "Show On", 0));
+        tabWidget->setTabText(tabWidget->indexOf(tab), QApplication::translate("MainWindow", "Tab 1", 0));
+        pushButton->setText(QApplication::translate("MainWindow", "PushButton", 0));
+        tabWidget->setTabText(tabWidget->indexOf(tab_2), QApplication::translate("MainWindow", "Tab 2", 0));
         menuFile->setTitle(QApplication::translate("MainWindow", "File", 0));
         menuView->setTitle(QApplication::translate("MainWindow", "View", 0));
         menuWidget->setTitle(QApplication::translate("MainWindow", "Widget", 0));

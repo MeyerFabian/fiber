@@ -137,21 +137,16 @@ void WindowHandler::init(vtkSmartPointer<vtkImageReader2> reader){
 
 
 	vc->BoxViewSpecifier(reader->GetOutputPort(), mapper, volume);
-	vc->ImagePlaneViewSpecifier(reader->GetOutputPort());
+	vc->ImagePlaneViewSpecifier(reader->GetOutputPort(),dim);
 
 	conn->addBoxView(window1);
 	conn->addImagePlaneView(window1);
 	window1->deactivateView();
 	if (window1->getViewMode() == BOX)
 	{
-		if (reductionFactor < 1.0)
-		{
-			view1 = vc->createBoxView();
-		}
-		else
-		{
-			view1 = new BoxView(reader->GetOutputPort(), mapper, volume);
-		}
+		
+		view1 = vc->createBoxView();
+		
 		window1->setView(view1);
 	}
 
@@ -160,8 +155,6 @@ void WindowHandler::init(vtkSmartPointer<vtkImageReader2> reader){
 	{
 		view1 = vc->createImagePlaneView();
 		window1->setView(view1);
-
-
 	}
 
 	if (reductionFactor < 1.0)

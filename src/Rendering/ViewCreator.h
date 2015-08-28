@@ -14,13 +14,14 @@ public:
     ViewCreator();
 	~ViewCreator();
 	void BoxViewSpecifier(vtkSmartPointer<vtkAlgorithmOutput> alg, vtkSmartPointer<vtkSmartVolumeMapper> mapper, vtkSmartPointer<vtkProp> prop);
-	void ImagePlaneViewSpecifier(vtkSmartPointer<vtkAlgorithmOutput> alg);
+	void ImagePlaneViewSpecifier(vtkSmartPointer<vtkAlgorithmOutput> alg,int dim[3]);
 	BoxView* createBoxView();
 	ImagePlaneView* createImagePlaneView();
 private:
 	vtkSmartPointer<vtkAlgorithmOutput> alg; 
 	vtkSmartPointer<vtkSmartVolumeMapper> mapper;
 	vtkSmartPointer<vtkProp> prop;
+	int dim[3];
 };
 
 #endif // VIEW_H
