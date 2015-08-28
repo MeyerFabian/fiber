@@ -43,6 +43,8 @@ src/Data/ImageReaderWrapper.h
 src/Data/ImageReaderWrapper.cpp
 src/Windowhandler.h
 src/Windowhandler.cpp
+src/FiberTracker.h
+src/FiberTracker.cpp
 src/TensorComputations/TensorComputations.cpp
 src/TensorComputations/TensorComputations.h
 ${FORMS_HEADERS})

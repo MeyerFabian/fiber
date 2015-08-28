@@ -265,21 +265,4 @@ void WindowHandler::init(vtkSmartPointer<vtkImageReader2> reader){
 
 }
 
-//Custom Vector classes
-vtkVector3d addVec(vtkVector3d vec1, vtkVector3d vec2){
-	vtkVector3d returnVec;
-	returnVec.Set(vec1.GetX() + vec2.GetX(), vec1.GetY() + vec2.GetY(), vec1.GetZ() + vec2.GetZ());
-	return returnVec;
-}
 
-vtkVector3d substractVec(vtkVector3d vec1, vtkVector3d vec2){
-	vtkVector3d returnVec;
-	returnVec.Set(vec1.GetX() - vec2.GetX(), vec1.GetY() - vec2.GetY(), vec1.GetZ() - vec2.GetZ());
-	return returnVec;
-}
-
-vtkVector3d multiplyVec(vtkVector3d vec1, double scalar){
-	vtkVector3d returnVec;
-	returnVec.Set(vec1.GetX() *scalar, vec1.GetY() *scalar, vec1.GetZ() *scalar);
-	return returnVec;
-}
