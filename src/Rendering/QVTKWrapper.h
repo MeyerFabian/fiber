@@ -25,6 +25,8 @@ public:
     void render();
     View* getView();
     void setView(View* view);
+	ViewMode getViewMode();
+	void deactivateView();
 public slots:
 	void switchToBoxView();
 	void switchToImagePlaneView();

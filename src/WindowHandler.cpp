@@ -8,6 +8,9 @@ WindowHandler::WindowHandler(int argc, char *argv[], Connector* conn, Ui::MainWi
 	for (int i = 0; i < argc; i++){
 		this->argv[i] = argv[i];
 	}
+
+	vc = new ViewCreator();
+	window1 = new QVTKWrapper(uimw->qvtkwidget, vc);
 }
 WindowHandler::~WindowHandler(){
 	delete view1;
@@ -267,16 +270,13 @@ void WindowHandler::init(vtkSmartPointer<vtkImageReader2> reader){
 	// Add a box widget if the clip option was selected
 
 
-	vc = new ViewCreator();
 	vc->BoxViewSpecifier(reader->GetOutputPort(), mapper, volume);
 	vc->ImagePlaneViewSpecifier(reader->GetOutputPort());
-	window1 = new QVTKWrapper(uimw->qvtkwidget, vc);
 
 	conn->addBoxView(window1);
 	conn->addImagePlaneView(window1);
-
-
-	if (view == 2)
+	window1->deactivateView();
+	if (window1->getViewMode()==BOX)
 	{
 		if (reductionFactor < 1.0)
 		{
@@ -290,7 +290,7 @@ void WindowHandler::init(vtkSmartPointer<vtkImageReader2> reader){
 	}
 
 	// Add a Imageplane widget if the imageplane option was selected
-	if (view == 1)
+	if (window1->getViewMode() == IMAGEPLANE)
 	{
 		view1 = vc->createImagePlaneView();
 		window1->setView(view1);

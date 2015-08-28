@@ -53,7 +53,9 @@ void QVTKWrapper::setView(View* v){
 View* QVTKWrapper::getView(){
     return this->view;
 }
-
+ViewMode QVTKWrapper::getViewMode(){
+	return this->activeView;
+}
 void QVTKWrapper::switchToBoxView(){
 	//CAN BE DONE WAY MORE EFFICIENT BY STORING PREVIOUS VIEWS, MIGHT CONSIDER DOING IT LATER ON
 	view->deactivate(this->renderer);
@@ -73,5 +75,12 @@ void QVTKWrapper::switchToImagePlaneView(){
 	setView(vc->createImagePlaneView());
 	if (view != NULL){
 		view->activate(this->renderer, this->iren);
+	}
+}
+
+
+void QVTKWrapper::deactivateView(){
+	if (view != NULL){
+		view->deactivate(this->renderer);
 	}
 }
