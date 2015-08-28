@@ -29,7 +29,9 @@ void FiberTracker::Init(){}
 */
 
 void FiberTracker::Update(vtkVector3d boxWidgetPos, vtkVector3d boxWidgetExtents, int seedPointsPerAxis){
-
+	cout << "FiberTracking Update called"<<endl;
+	cout << "Position: (" << boxWidgetPos.GetX() << "," << boxWidgetPos.GetY() << "," << boxWidgetPos.GetZ() << ")" << endl;
+	cout << "Size: (" << boxWidgetExtents.GetX() << "," << boxWidgetExtents.GetY() << "," << boxWidgetExtents.GetZ() << ")" << endl;
 	/*
 	tensorComp = new TensorComputations();
 
@@ -144,25 +146,6 @@ void FiberTracker::Update(vtkVector3d boxWidgetPos, vtkVector3d boxWidgetExtents
 	*/
 }
 
-
-//Custom Vector classes
-vtkVector3d addVec(vtkVector3d vec1, vtkVector3d vec2){
-	vtkVector3d returnVec;
-	returnVec.Set(vec1.GetX() + vec2.GetX(), vec1.GetY() + vec2.GetY(), vec1.GetZ() + vec2.GetZ());
-	return returnVec;
-}
-
-vtkVector3d substractVec(vtkVector3d vec1, vtkVector3d vec2){
-	vtkVector3d returnVec;
-	returnVec.Set(vec1.GetX() - vec2.GetX(), vec1.GetY() - vec2.GetY(), vec1.GetZ() - vec2.GetZ());
-	return returnVec;
-}
-
-vtkVector3d multiplyVec(vtkVector3d vec1, double scalar){
-	vtkVector3d returnVec;
-	returnVec.Set(vec1.GetX() *scalar, vec1.GetY() *scalar, vec1.GetZ() *scalar);
-	return returnVec;
-}
 
 
 /////////////////////////////////////////

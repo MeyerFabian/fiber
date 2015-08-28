@@ -64,6 +64,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "Rendering/ViewCreator.h"
 
 #include "Data/ImageReaderWrapper.h"
+#include "Tracking/FiberTracker.h"
 
 #define VTI_FILETYPE 1
 #define MHA_FILETYPE 2
@@ -75,6 +76,7 @@ vtkVector3d substractVec(vtkVector3d vec1, vtkVector3d vec2);
 vtkVector3d multiplyVec(vtkVector3d vec1, double scalar);
 
 class Connector;
+class QVTKWrapper;
 class WindowHandler :public QObject
 {
 	Q_OBJECT
@@ -89,9 +91,10 @@ private:
 	int argc;
 	View* view1;
 	ViewCreator* vc;
-	QVTKWrapper* window1;
+	QVTKWrapper* window1; 
 	TensorComputations* tensorComp;
 	char* argv[];
+
 };
 
 #endif // WINDOWHANDLER_H

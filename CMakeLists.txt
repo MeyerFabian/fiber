@@ -34,6 +34,8 @@ src/Rendering/BoxView.cpp
 src/Rendering/BoxView.h
 src/Rendering/ViewCreator.h
 src/Rendering/ViewCreator.cpp
+src/Rendering/SelectionBox.h
+src/Rendering/SelectionBox.cpp
 src/GUI/ui_mainwindow.h
 src/GUI/FileMenu.h
 src/GUI/FileMenu.cpp
@@ -43,8 +45,8 @@ src/Data/ImageReaderWrapper.h
 src/Data/ImageReaderWrapper.cpp
 src/Windowhandler.h
 src/Windowhandler.cpp
-src/FiberTracker.h
-src/FiberTracker.cpp
+src/Tracking/FiberTracker.h
+src/Tracking/FiberTracker.cpp
 src/TensorComputations/TensorComputations.cpp
 src/TensorComputations/TensorComputations.h
 ${FORMS_HEADERS})

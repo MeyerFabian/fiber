@@ -25,3 +25,10 @@ bool Connector::addImagePlaneView(QVTKWrapper* qvtk){
 bool Connector::addWindowHandler(ImageReaderWrapper* iw, WindowHandler* wh){
 	return QObject::connect(iw, SIGNAL(initRenderer(vtkSmartPointer<vtkImageReader2>)), wh, SLOT(init(vtkSmartPointer<vtkImageReader2>)));
 }
+bool Connector::addSelectionBox(QVTKWrapper* qvtk){
+	return QObject::connect(uimw->pushButton, SIGNAL(clicked()), qvtk, SLOT(addSelectionBox()));
+}
+
+bool Connector::addFiberTracker(QVTKWrapper* qvtk){
+	return QObject::connect(qvtk->GetSelectionBox(), SIGNAL(SelectionBoxChanged(vtkVector3d, vtkVector3d, int)), qvtk, SLOT(Update(vtkVector3d, vtkVector3d, int)));
+}

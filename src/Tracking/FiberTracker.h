@@ -1,9 +1,10 @@
+#ifndef FIBERTRACKER_H
+#define FIBERTRACKER_H
 #include "vtkVector.h"
 #include "vtkVectorDot.h"
-#include "TensorComputations/TensorComputations.h"
+#include "../TensorComputations/TensorComputations.h"
 #include "vtkPointLocator.h"
 
-#pragma once
 class FiberTracker
 {
 public:
@@ -13,3 +14,4 @@ public:
 	void Update(vtkVector3d boxWidgetPos, vtkVector3d boxWidgetExtents, int seedPointsPerAxis);
 };
 
+#endif

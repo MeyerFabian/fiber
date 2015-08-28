@@ -8,7 +8,11 @@
 #include <vector>
 #include "../Rendering/QVTKWrapper.h"
 #include "../WindowHandler.h"
+#include "vtkVector.h"
+#include "../Tracking/FiberTracker.h"
+#include "../Rendering/SelectionBox.h"
 class WindowHandler;
+class QVTKWrapper;
 class Connector 
 {
 public:
@@ -18,6 +22,8 @@ public:
 	bool addBoxView(QVTKWrapper* qvtk);
 	bool addImagePlaneView(QVTKWrapper* qvtk);
 	bool addWindowHandler(ImageReaderWrapper* iw, WindowHandler* wh);
+	bool addSelectionBox(QVTKWrapper* qvtk);
+	bool addFiberTracker(QVTKWrapper* qvtk);
 private:
 	QMainWindow* window;
 	Ui::MainWindow* uimw;

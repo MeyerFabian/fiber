@@ -10,7 +10,7 @@ WindowHandler::WindowHandler(int argc, char *argv[], Connector* conn, Ui::MainWi
 	}
 
 	vc = new ViewCreator();
-	window1 = new QVTKWrapper(uimw->qvtkwidget, vc);
+	window1 = new QVTKWrapper(uimw->qvtkwidget, vc,conn);
 }
 WindowHandler::~WindowHandler(){
 	delete view1;
@@ -141,7 +141,10 @@ void WindowHandler::init(vtkSmartPointer<vtkImageReader2> reader){
 
 	conn->addBoxView(window1);
 	conn->addImagePlaneView(window1);
+	conn->addSelectionBox(window1);
 	window1->deactivateView();
+
+
 	if (window1->getViewMode() == BOX)
 	{
 		

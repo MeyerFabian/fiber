@@ -32,7 +32,7 @@ BoxView::BoxView(vtkSmartPointer<vtkAlgorithmOutput> alg,  vtkSmartPointer<vtkSm
     View()
 {
 
-    box->SetPlaceFactor(1.01);
+    box->SetPlaceFactor(1.00);
     box->SetInputConnection(alg);
     box->InsideOutOn();
     box->PlaceWidget();
@@ -58,7 +58,7 @@ void BoxView::activate(vtkSmartPointer<vtkRenderer> renderer, vtkSmartPointer<vt
     box->EnabledOn();
 }
 void BoxView::deactivate(vtkSmartPointer<vtkRenderer> renderer){
-	renderer->RemoveAllViewProps();
+	renderer->RemoveActor(prop);
 	box->EnabledOff();
 	
 }

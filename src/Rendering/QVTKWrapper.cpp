@@ -1,6 +1,6 @@
 #include "QVTKWrapper.h"
 
-QVTKWrapper::QVTKWrapper(QVTKWidget* qvtk ,ViewCreator* vc)
+QVTKWrapper::QVTKWrapper(QVTKWidget* qvtk ,ViewCreator* vc, Connector* conn)
 {
     renderer = vtkSmartPointer<vtkRenderer>::New();
     renWin = vtkSmartPointer<vtkRenderWindow>::New();
@@ -11,6 +11,7 @@ QVTKWrapper::QVTKWrapper(QVTKWidget* qvtk ,ViewCreator* vc)
     iren->SetInteractorStyle(istyle);
     this-> qvtkwidget =qvtk;
 	this->vc = vc;
+	this->conn = conn;
 }
 
 QVTKWrapper::~QVTKWrapper(){
@@ -82,4 +83,23 @@ void QVTKWrapper::deactivateView(){
 	if (view != NULL){
 		view->deactivate(this->renderer);
 	}
+}
+
+void QVTKWrapper::addSelectionBox(){
+	if (sb != NULL){
+		sb->deactivate(this->renderer);
+	}
+	delete sb;
+	sb = new SelectionBox();
+	ft = new FiberTracker();
+	conn->addFiberTracker(this);
+	sb->activate(this->renderer, this->iren);
+}
+SelectionBox* QVTKWrapper::GetSelectionBox(){
+	return sb;
+}
+
+
+void QVTKWrapper::Update(vtkVector3d boxWidgetPos, vtkVector3d boxWidgetExtents, int seedPointsPerAxis){
+	ft->Update(boxWidgetPos, boxWidgetExtents, seedPointsPerAxis);
 }

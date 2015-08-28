@@ -199,7 +199,7 @@ public:
 
     void retranslateUi(QMainWindow *MainWindow)
     {
-        MainWindow->setWindowTitle(QApplication::translate("MainWindow", "MainWindow", 0));
+        MainWindow->setWindowTitle(QApplication::translate("MainWindow", "Fiber Tracking", 0));
         actionOpen->setText(QApplication::translate("MainWindow", "Open..", 0));
         actionReset->setText(QApplication::translate("MainWindow", "Reset", 0));
         actionSuperior->setText(QApplication::translate("MainWindow", "Superior", 0));
@@ -208,7 +208,7 @@ public:
         actionBox->setText(QApplication::translate("MainWindow", "Box", 0));
         actionShow_On_off->setText(QApplication::translate("MainWindow", "Show On", 0));
         tabWidget->setTabText(tabWidget->indexOf(tab), QApplication::translate("MainWindow", "Tab 1", 0));
-        pushButton->setText(QApplication::translate("MainWindow", "PushButton", 0));
+        pushButton->setText(QApplication::translate("MainWindow", "Fiber Tracking", 0));
         tabWidget->setTabText(tabWidget->indexOf(tab_2), QApplication::translate("MainWindow", "Tab 2", 0));
         menuFile->setTitle(QApplication::translate("MainWindow", "File", 0));
         menuView->setTitle(QApplication::translate("MainWindow", "View", 0));
