@@ -97,16 +97,16 @@ void WindowHandler::init(vtkSmartPointer<vtkImageReader2> reader){
 		}
 	}
 
-	
+
 	// Read the data
 	vtkSmartPointer<vtkImageData> input = 0;
 
 	input = reader->GetOutput();
 
-	
+
 	int dim[3];
 	input->GetDimensions(dim);
-	
+
 	// Verify that we actually have a volume
 
 	if (dim[0] < 2 ||
@@ -116,140 +116,6 @@ void WindowHandler::init(vtkSmartPointer<vtkImageReader2> reader){
 		cout << "Error loading data!" << endl;
 		exit(EXIT_FAILURE);
 	}
-	
-	
-	//////////////////////////////////////////
-	// FIBERTRACKING MAINPART ////////////////
-	//////////////////////////////////////////
-	/*
-	//#Valle: Get tensors from data
-
-
-	tensorComp = new TensorComputations();
-
-	for (int z = 0; z < dim[2]; z++)
-	{
-	for (int y = 0; y < dim[1]; y++)
-	{
-	for (int x = 0; x < dim[0]; x++)
-	{
-	int ijk[3];
-	ijk[0] = x;
-	ijk[1] = y;
-	ijk[2] = z;
-	vtkIdType pointID = input->ComputeCellId(ijk);	//korrekte Methode??
-
-	vtkSmartPointer<vtkMatrix3x3> tensors = tensorComp->GetTensorsFromNIFTI(reader, pointID);
-	vtkSmartPointer<vtkMatrix3x3> eigenvectors = tensorComp->GetEigenvectorsFromTensor(tensors);
-
-	//Valle: Call main traverse function
-	//TrackFibers(startpoint, input, tensors);
-	}
-	}
-	}
-
-
-	// -------------- Global/GUI Parameters/variables
-	double stepSize = 1;
-	double f = 0;
-	double g = 0;
-	vtkVector3d one;
-	one.Set(1, 1, 1);
-	vtkVector3d startPoint;
-	startPoint.Set(0,0,0);																	//in structured coordinates for point ID
-
-	vtkVector3d currentPos;
-	vtkVector3d currentDir;																	//= next step direction = incoming direction = V_n-1
-
-	// ------------- Initialize
-
-	currentPos.Set(startPoint.GetX(), startPoint.GetY(), startPoint.GetZ());
-	int ijk[3];
-	ijk[1] = startPoint.GetX();
-	ijk[1] = startPoint.GetY();
-	ijk[1] = startPoint.GetZ();
-	vtkIdType pointID = input->ComputeCellId(ijk);											//oder input->FindCell(FindCell(currentPos); ??
-
-	vtkSmartPointer<vtkMatrix3x3> tensors = tensorComp->GetTensorsFromNIFTI(reader, pointID);
-	vtkSmartPointer<vtkMatrix3x3> eigenvectorMatrix = tensorComp->GetEigenvectorsFromTensor(tensors);
-
-	vtkVector3d eigenvectors[3];
-	eigenvectors[0].Set(eigenvectorMatrix->GetElement(0, 0), eigenvectorMatrix->GetElement(0, 1), eigenvectorMatrix->GetElement(0, 2));	//Reihenfolge?!
-	eigenvectors[1].Set(eigenvectorMatrix->GetElement(1, 0), eigenvectorMatrix->GetElement(1, 1), eigenvectorMatrix->GetElement(1, 2));
-	eigenvectors[2].Set(eigenvectorMatrix->GetElement(2, 0), eigenvectorMatrix->GetElement(2, 1), eigenvectorMatrix->GetElement(2, 2));
-
-	int random = rand() % 3 + 1;	// In the range 1 to 3	//#ToDo: Make vector-norm dependent!
-
-	if (random == 1)
-	currentDir = eigenvectors[0].Normalized();
-	else if (random == 2)
-	currentDir = eigenvectors[1].Normalized();
-	else if (random == 3)
-	currentDir = eigenvectors[2].Normalized();
-	else
-	cout << "ERROR" << endl;
-
-	// -----------------
-
-	int counter = 0;	//TEMP
-	vtkSmartPointer<vtkPointLocator> pointLocator = vtkSmartPointer<vtkPointLocator>::New();
-
-	while (counter<50){		//#ToDo: Abbruchbed. einsetzen
-
-	double curPos[3];
-	curPos[0] = currentPos.GetX();
-	curPos[1] = currentPos.GetY();
-	curPos[2] = currentPos.GetZ();
-	pointID = pointLocator->FindClosestPoint(curPos);
-	//Perform step
-	currentPos = addVec(currentPos,multiplyVec(currentDir.Normalized(), stepSize));
-
-	//Get current corresponding pointID
-
-	curPos[0] = currentPos.GetX();
-	curPos[1] = currentPos.GetY();
-	curPos[2] = currentPos.GetZ();
-	vtkIdType newPointID = pointLocator->FindClosestPoint(curPos);
-
-	//Check if entering new voxel
-	if (newPointID != pointID){
-	//Determine next direction with smallest angle to incoming direction
-	tensors = tensorComp->GetTensorsFromNIFTI(reader, newPointID);
-	eigenvectorMatrix = tensorComp->GetEigenvectorsFromTensor(tensors);
-
-	float angles[3];
-	angles[0] = eigenvectors[0].Dot(currentDir);
-	angles[1] = eigenvectors[1].Dot(currentDir);
-	angles[2] = eigenvectors[2].Dot(currentDir);
-
-	//find next direction = eigenvector with smallest angle
-	float smallestAngle = angles[0];
-	vtkVector3d v_n = eigenvectors[0];
-	for (int i = 1; i < 3; i++){
-	if (angles[i] < smallestAngle){
-	smallestAngle = angles[i];
-	v_n = eigenvectors[i];
-	}
-	}
-	vtkVector3d v_nPlus1 = addVec(multiplyVec(v_n, f), multiplyVec(addVec(multiplyVec(currentDir, (1 - g)), multiplyVec(v_n, g)), (1 - f)));		//Tracking formula //Gives out next direction
-	currentDir = v_nPlus1;
-	}
-	else{
-	//?
-	}
-
-	// Add point and tangent vector to renderer
-	//HyperstreamBSplineRenderer.Append(currentPos, currentDir, streamlineID);
-
-	counter++;
-	//delete ...;
-	}
-
-
-	/////////////////////////////////////////
-	
-
-	*/
 
 
 
@@ -276,7 +142,7 @@ void WindowHandler::init(vtkSmartPointer<vtkImageReader2> reader){
 	conn->addBoxView(window1);
 	conn->addImagePlaneView(window1);
 	window1->deactivateView();
-	if (window1->getViewMode()==BOX)
+	if (window1->getViewMode() == BOX)
 	{
 		if (reductionFactor < 1.0)
 		{

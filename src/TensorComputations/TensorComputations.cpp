@@ -31,9 +31,10 @@ vtkSmartPointer<vtkMatrix3x3> TensorComputations::GetTensorsFromNIFTI(vtkSmartPo
 		}
 
 		tensorMatrix->SetElement(x, y, tensor[i]);
+		x++;
 	}
 
-	delete tensor, x, y;
+	//delete tensor, x, y;
 	return tensorMatrix;
 }
 
