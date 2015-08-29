@@ -45,7 +45,7 @@ void FiberTracker::Update(vtkVector3d boxWidgetPos, vtkVector3d boxWidgetExtents
 	//Line 1
 	fiberlines->push_back(vtkSmartPointer<vtkPoints>::New());
 		//Point 1
-		double p00[3] = { 0.0, 0.0, 0.0 };
+	double p00[3] = { boxWidgetPos.GetX(), boxWidgetPos.GetY(), boxWidgetPos.GetZ() };
 		fiberlines->at(0)->InsertNextPoint(p00);
 		//Point 2
 		double p01[3] = { 5.0, 0.0, 0.0 };
@@ -63,7 +63,7 @@ void FiberTracker::Update(vtkVector3d boxWidgetPos, vtkVector3d boxWidgetExtents
 	//Line 2
 	fiberlines->push_back(vtkSmartPointer<vtkPoints>::New());
 		//Point 1
-		double p10[3] = { 0.0, 0.0, 0.0 };
+	double p10[3] = { boxWidgetPos.GetX(), boxWidgetPos.GetY(), boxWidgetPos.GetZ() };
 		fiberlines->at(1)->InsertNextPoint(p00);
 		//Point 2
 		double p11[3] = { 50.0, 0.0, 0.0 };

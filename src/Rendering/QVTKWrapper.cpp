@@ -90,16 +90,13 @@ void QVTKWrapper::addMainAlgorithm(){
 		sb->deactivate(this->renderer);
 	}
 	delete sb;
-	if (fl != NULL){
-		fl->deactivate(this->renderer);
-	}
+	delete ft;
 	sb = new SelectionBox();
 	ft = new FiberTracker();
 	conn->addFiberTracker(this);
-	fl = new Fiber();
+	fl = new Fiber(this->renderer);
 	conn->addFiberLines(this);
 	sb->activate(this->renderer, this->iren);
-	fl->activate(this->renderer, this->iren);
 	GetRenderWindow()->Render();
 }
 SelectionBox* QVTKWrapper::GetSelectionBox(){

@@ -1,18 +1,24 @@
 #include "Fiber.h"
 
-Fiber::Fiber(){
+Fiber::Fiber(vtkSmartPointer<vtkRenderer> renderer){
+	this->renderer = renderer;
 	actors = std::vector<vtkSmartPointer<vtkActor> >();
 }
 
 Fiber::~Fiber(){
 }
 
-void Fiber::activate(vtkSmartPointer<vtkRenderer> renderer, vtkSmartPointer<vtkRenderWindowInteractor> rendint){
+void Fiber::activate(){
 	for (std::vector<vtkSmartPointer<vtkActor> >::size_type t = 0; t < actors.size(); t++){
 		renderer->AddViewProp(actors.at(t));
+
 	}
+
+	cout << "FiberLines Activate called" << endl;
 }
 void Fiber::update(std::vector<vtkSmartPointer<vtkPoints> >* fiberlines){
+
+	deactivate();
 	actors.clear();
 	cout << "FiberLines Update called" << endl;
 	size_t numberOfPoints=0;
@@ -51,11 +57,10 @@ void Fiber::update(std::vector<vtkSmartPointer<vtkPoints> >* fiberlines){
 		actors.push_back(actor1);
 
 	}
-
-
+	activate();
 	
 }
-void Fiber::deactivate(vtkSmartPointer<vtkRenderer> renderer){
+void Fiber::deactivate(){
 	for (std::vector<vtkSmartPointer<vtkActor> >::size_type t = 0; t < actors.size(); t++){
 		renderer->RemoveViewProp(actors.at(t));
 	}

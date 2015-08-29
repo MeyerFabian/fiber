@@ -14,17 +14,18 @@ class Fiber : public QObject
 {
 	Q_OBJECT
 public:
-	Fiber();
+	Fiber(vtkSmartPointer<vtkRenderer> renderer);
 	~Fiber();
 
 
 public:    
-	void activate(vtkSmartPointer<vtkRenderer> renderer, vtkSmartPointer<vtkRenderWindowInteractor> rendint);
-	void deactivate(vtkSmartPointer<vtkRenderer> renderer);
+	void activate();
+	void deactivate();
 public slots:
 void update(std::vector<vtkSmartPointer<vtkPoints> >*);
 private:
 	std::vector< vtkSmartPointer<vtkActor>> actors;
+	vtkSmartPointer<vtkRenderer> renderer;
 	
 };
 
