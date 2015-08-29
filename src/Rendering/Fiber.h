@@ -7,7 +7,9 @@
 #include "vtkPoints.h"
 #include <vector>
 #include "vtkPolyLine.h"
-
+#include "vtkCellArray.h"
+#include "vtkPolyData.h"
+#include "vtkPolyDataMapper.h"
 class Fiber : public QObject 
 {
 	Q_OBJECT
@@ -21,7 +23,8 @@ public:
 	void deactivate(vtkSmartPointer<vtkRenderer> renderer);
 public slots:
 void update(std::vector<vtkSmartPointer<vtkPoints> >*);
-
+private:
+	std::vector< vtkSmartPointer<vtkActor>> actors;
 	
 };
 
