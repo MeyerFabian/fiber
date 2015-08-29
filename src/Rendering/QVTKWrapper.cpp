@@ -89,6 +89,9 @@ void QVTKWrapper::addMainAlgorithm(){
 	if (sb != NULL){
 		sb->deactivate(this->renderer);
 	}
+	if (fl != NULL){
+		fl->deactivate();
+	}
 	delete sb;
 	delete ft;
 	sb = new SelectionBox();
