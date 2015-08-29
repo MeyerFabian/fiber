@@ -85,7 +85,7 @@ void QVTKWrapper::deactivateView(){
 	}
 }
 
-void QVTKWrapper::addSelectionBox(){
+void QVTKWrapper::addMainAlgorithm(){
 	if (sb != NULL){
 		sb->deactivate(this->renderer);
 	}
@@ -93,13 +93,20 @@ void QVTKWrapper::addSelectionBox(){
 	sb = new SelectionBox();
 	ft = new FiberTracker();
 	conn->addFiberTracker(this);
+	fl = new Fiber();
+	conn->addFiberLines(this);
 	sb->activate(this->renderer, this->iren);
+	fl->activate(this->renderer, this->iren);
 }
 SelectionBox* QVTKWrapper::GetSelectionBox(){
 	return sb;
 }
-
-
+FiberTracker* QVTKWrapper::GetFiberTracker(){
+	return ft;
+}
+Fiber* QVTKWrapper::GetFiber(){
+	return fl;
+}
 void QVTKWrapper::Update(vtkVector3d boxWidgetPos, vtkVector3d boxWidgetExtents, int seedPointsPerAxis){
 	ft->Update(boxWidgetPos, boxWidgetExtents, seedPointsPerAxis);
 }

@@ -62,7 +62,7 @@ void SelectionBox::update(){
 	boxWidgetExtents.SetX(*(bounds+1) - *(bounds));
 	boxWidgetExtents.SetY(*(bounds+3)-*(bounds + 2));
 	boxWidgetExtents.SetZ(*(bounds+5)-*(bounds + 4));
-	int seedPointsperAxis = 1000;
+	int seedPointsperAxis = 10;
 	emit SelectionBoxChanged(boxWidgetPos, boxWidgetExtents, seedPointsperAxis);
 		
 }
