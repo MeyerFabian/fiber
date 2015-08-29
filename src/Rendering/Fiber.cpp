@@ -25,7 +25,10 @@ void Fiber::activate(vtkSmartPointer<vtkRenderer> renderer, vtkSmartPointer<vtkR
 }
 void Fiber::update(std::vector<vtkSmartPointer<vtkPoints> >* fiberlines){
 	cout << "FiberLines Update called" << endl;
-		
+	for (std::vector<vtkSmartPointer<vtkPoints> >::size_type t = 0; t < fiberlines->size(); t++){
+		vtkSmartPointer<vtkPolyLine> polyLine = vtkSmartPointer<vtkPolyLine>::New();
+		fiberlines->at(t)->Print(cout);
+	}
 }
 void Fiber::deactivate(vtkSmartPointer<vtkRenderer> renderer){
 	/*

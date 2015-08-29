@@ -6,6 +6,7 @@
 #include <qobject.h>
 #include "vtkPoints.h"
 #include <vector>
+#include "vtkPolyLine.h"
 
 class Fiber : public QObject 
 {
