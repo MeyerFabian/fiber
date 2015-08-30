@@ -4,6 +4,10 @@ Repository for the fiber tracking project.
 REQUIRED:
 VTK (6.2.0) http://www.vtk.org/download/
 
+QT (5) http://www.qt.io/qt5-5/
+
+GLEW (1.10) http://glew.sourceforge.net/
+
 Use MSVC Compiler (2013)
 
 Windows (tested only on Windows)
@@ -24,7 +28,7 @@ PATH: %MSVC%\bin;%QTDIR%\bin;%VTKDIR%;%GLEWDIR%;
 
 INSTALLATION:
 
-1.  Download and install Qt with QTDesigner
+1.  Download and install GLEW and Qt along with QTDesigner
 
 2.  Download and install VTK from http://www.vtk.org/download/ using CMake and Visual Studio 2013.
 
@@ -43,7 +47,7 @@ INSTALLATION:
 
 5.  Download or use your own (converted) NIFTI-Images and put them somewhere in the bin folder, where you will find them (e.g. bin/datasets/dti30/dti30.nii)
 
-6.  Run fiber.exe from command line with the dataset: "fiber -NIFTI datasets/dti30/dti30.nii -Imageplane"
+6.  Run fiber.exe
 
 
 INPUT DATA:
@@ -53,9 +57,3 @@ INPUT DATA:
 EXAMPLE DATASETS:
 
 http://scil.dinf.usherbrooke.ca/?page_id=822
-
-Links for development:
-
-Will probably feature QT for GUI, examples can be found here: http://www.vtk.org/Wiki/VTK/Examples/Cxx#Qt
-
-B-Spline Generation to create fibers from points using VTK: http://www.vtkjournal.org/browse/publication/790
