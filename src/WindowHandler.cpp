@@ -18,23 +18,36 @@ WindowHandler::~WindowHandler(){
 	delete window1;
 	delete tensorComp;
 }
-void WindowHandler::init(vtkSmartPointer<vtkImageReader2> reader){
 
+/*
+*
+*	init is called when a file has been selected, so we can specify the
+*	views and volume of the file. Therefore we get the reader as a parameter
+*	initialize our properties with the output of the reader.
+*
+*	Most of the init is borrowed from the GPURenderDemo.cxx:
+*	https://github.com/Kitware/VTK/blob/master/Examples/VolumeRendering/Cxx/GPURenderDemo.cxx
+=========================================================================
+Program:   Visualization Toolkit
+Module:    GPURenderDemo.cxx
+Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
+All rights reserved.
+See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notice for more information.
+=========================================================================
+*/
+void WindowHandler::init(vtkSmartPointer<vtkImageReader2> reader){
+	
 
 	// Parse the parameters
 	int count = 1;
-	char *dirname = NULL;
 	double opacityWindow = 0.02;
 	double opacityLevel = 0.01;
 	int blendType = 0;
-	int clip = 0;
-	double reductionFactor = 1.0;
-	double frameRate = 10.0;
-	char *fileName = 0;
 	int fileType = 0;
 	int view = 1;
-
-	bool independentComponents = true;
 
 	while (count < argc)
 	{
@@ -63,46 +76,12 @@ void WindowHandler::init(vtkSmartPointer<vtkImageReader2> reader){
 			blendType = 2;
 			count += 3;
 		}
-		else if (!strcmp(argv[count], "-RGB_Composite"))
-		{
-			blendType = 6;
-			count += 1;
-		}
-		else if (!strcmp(argv[count], "-FrameRate"))
-		{
-			frameRate = atof(argv[count + 1]);
-			if (frameRate < 0.01 || frameRate > 60.0)
-			{
-				cout << "Invalid frame rate - use a number between 0.01 and 60.0" << endl;
-				cout << "Using default frame rate of 10 frames per second." << endl;
-				frameRate = 10.0;
-			}
-			count += 2;
-		}
-		else if (!strcmp(argv[count], "-ReductionFactor"))
-		{
-			reductionFactor = atof(argv[count + 1]);
-			if (reductionFactor <= 0.0 || reductionFactor >= 1.0)
-			{
-				cout << "Invalid reduction factor - use a number between 0 and 1 (exclusive)" << endl;
-				cout << "Using the default of no reduction." << endl;
-				reductionFactor = 1.0;
-			}
-			count += 2;
-		}
-		else if (!strcmp(argv[count], "-DependentComponents"))
-		{
-			independentComponents = false;
-			count += 1;
-		}
 	}
 
 
 	// Read the data
 	vtkSmartPointer<vtkImageData> input = 0;
-
 	input = reader->GetOutput();
-
 
 	int dim[3];
 	input->GetDimensions(dim);
@@ -119,23 +98,13 @@ void WindowHandler::init(vtkSmartPointer<vtkImageReader2> reader){
 
 
 
-	vtkSmartPointer<vtkImageResample> resample = vtkSmartPointer<vtkImageResample>::New();
-	if (reductionFactor < 1.0)
-	{
-		resample->SetInputConnection(reader->GetOutputPort());
-		resample->SetAxisMagnificationFactor(0, reductionFactor);
-		resample->SetAxisMagnificationFactor(1, reductionFactor);
-		resample->SetAxisMagnificationFactor(2, reductionFactor);
-	}
 
-	// Create our volume and mapper
+	// Create volume and mapper
 	vtkSmartPointer<vtkVolume> volume = vtkSmartPointer<vtkVolume>::New();
 	vtkSmartPointer<vtkSmartVolumeMapper> mapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
 
 
-	// Add a box widget if the clip option was selected
-
-
+	// Specifiy the 
 	vc->BoxViewSpecifier(reader->GetOutputPort(), mapper, volume);
 	vc->ImagePlaneViewSpecifier(reader->GetOutputPort(),dim);
 
@@ -160,26 +129,19 @@ void WindowHandler::init(vtkSmartPointer<vtkImageReader2> reader){
 		window1->setView(view1);
 	}
 
-	if (reductionFactor < 1.0)
-	{
-		mapper->SetInputConnection(resample->GetOutputPort());
-	}
-	else
-	{
+
+	
 		mapper->SetInputConnection(reader->GetOutputPort());
-	}
+	
 
 
 	// Set the sample distance on the ray to be 1/2 the average spacing
 	double spacing[3];
-	if (reductionFactor < 1.0)
-	{
-		resample->GetOutput()->GetSpacing(spacing);
-	}
-	else
-	{
+	
+	
+	
 		input->GetSpacing(spacing);
-	}
+	
 
 	//  mapper->SetSampleDistance( (spacing[0]+spacing[1]+spacing[2])/6.0 );
 	//  mapper->SetMaximumImageSampleDistance(10.0);
@@ -191,7 +153,6 @@ void WindowHandler::init(vtkSmartPointer<vtkImageReader2> reader){
 
 	// Create the property and attach the transfer functions
 	vtkSmartPointer<vtkVolumeProperty> property = vtkSmartPointer<vtkVolumeProperty>::New();
-	property->SetIndependentComponents(independentComponents);
 	property->SetColor(colorFun);
 	property->SetScalarOpacity(opacityFun);
 	property->SetInterpolationTypeToLinear();
@@ -263,6 +224,7 @@ void WindowHandler::init(vtkSmartPointer<vtkImageReader2> reader){
 		vtkGenericWarningMacro("Unknown blend type.");
 		break;
 	}
+
 
 	window1->render();
 

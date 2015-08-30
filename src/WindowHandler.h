@@ -1,19 +1,10 @@
-
-/*=========================================================================
-
-Program:   Visualization Toolkit
-Module:    GPURenderDemo.cxx
-
-Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
-All rights reserved.
-See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
-
-This software is distributed WITHOUT ANY WARRANTY; without even
-the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-PURPOSE.  See the above copyright notice for more information.
-
-=========================================================================*/
-
+/*	WindowHandler.h
+*
+*		Handles Initialization of the QVTKWrapper(for GUI and Rendering)
+*		and the rendered properties as well.
+*
+*	Fabian
+*/
 
 
 #ifndef WINDOWHANDLER_H
@@ -66,9 +57,6 @@ PURPOSE.  See the above copyright notice for more information.
 #include "Data/ImageReaderWrapper.h"
 #include "Tracking/FiberTracker.h"
 
-#define VTI_FILETYPE 1
-#define MHA_FILETYPE 2
-#define NIFTI_FILETYPE 3
 
 
 vtkVector3d addVec(vtkVector3d vec1, vtkVector3d vec2);
@@ -77,6 +65,8 @@ vtkVector3d multiplyVec(vtkVector3d vec1, double scalar);
 
 class Connector;
 class QVTKWrapper;
+
+
 class WindowHandler :public QObject
 {
 	Q_OBJECT

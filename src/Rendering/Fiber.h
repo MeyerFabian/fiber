@@ -1,3 +1,13 @@
+/*	Fiber.h
+*
+*		To visualize Fibers this class provides methods to create Fiberlines from the points,
+*		which are calculated by the Fibertracker and renders them to the window. Essentially 
+*		updates should be called whenever a parameter changes. 
+*		(e.g. SelectionBox moves, more seedpoints etc.)
+*
+*	Fabian
+*/
+
 #ifndef FIBER_H
 #define FIBER_H
 #include "vtkSmartPointer.h"

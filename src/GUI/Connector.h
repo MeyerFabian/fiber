@@ -1,3 +1,16 @@
+/*	Connector.h
+*
+*		Qt uses a Signal-Slot Design Pattern to communicate between GUI and functions.
+*		The Connector connects the various GUI elements and functions to signal other methods
+*		that something (e.g. a parameter) has changed and the functions needs to update.
+*		e.g. When switching to BoxView in the GUI a signal from the GUI-Element is sent
+*		to the QVTKWrapper to switch the view.
+*		to a BoxView.
+*
+*	Fabian
+*/
+
+
 #ifndef CONNECTOR_H
 #define CONNECTOR_H
 #include <qfiledialog.h>

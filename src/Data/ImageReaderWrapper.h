@@ -1,3 +1,11 @@
+/*	ImageReaderWrapper.h
+*
+*		Holds the reader which is used to read in files and signals the WindowHandler to begin
+*		with Rendering, when a file was read in.
+*
+*	Fabian
+*/
+
 #ifndef IMAGEREADERWRAPPER_H
 #define IMAGEREADERWRAPPER_H
 #include <qobject.h>

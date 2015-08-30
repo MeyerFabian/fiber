@@ -1,3 +1,10 @@
+/*	ViewCreator.h
+*
+*		The ViewCreator can create new Views on the fly when the View is specified before.
+*
+*	Fabian
+*/
+
 #ifndef VIEWCREATOR_H
 #define VIEWCREATOR_H
 
@@ -8,6 +15,7 @@
 #include "view.h"
 #include "BoxView.h"
 #include "ImagePlaneView.h"
+
 class ViewCreator
 {
 public:

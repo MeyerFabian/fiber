@@ -1,3 +1,11 @@
+/*	View.h
+*
+*		Used for Abstraction between different views, right now ImagePlaneView.h
+*		and BoxView.h inherit it: More Views are possible. 
+*		The class is created to make the process of adding other views easier.
+*
+*	Fabian
+*/
 #ifndef VIEW_H
 #define VIEW_H
 #include "vtkRenderer.h"

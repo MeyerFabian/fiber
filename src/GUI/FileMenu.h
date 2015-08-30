@@ -1,3 +1,11 @@
+/*	FileMenu.h
+*
+*		Whenever we use the File->Open.. Action in the GUI a FileDialog occurs to open a NIFTI file.
+*		This class takes care of opening the Dialog, selecting the file and 
+*		handing it over to the reader.
+*
+*	Fabian
+*/
 #ifndef FILEMENU_H
 #define FILEMENU_H
 #include <qobject.h>

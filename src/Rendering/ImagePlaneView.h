@@ -1,3 +1,12 @@
+/*	ImagePlaneView.h
+*
+*		Adds 3 ImagePlaneWidgets that can be dragged around the volume and are restricted to it.
+*		The Widgets cannot be rotated, which is desirable:
+*		Every Plane is exactly parallel to two axis at any time.
+*		The Slices are displayed on the ImagePlaneWidget and allow to orientate the fiber in the volume.
+*	
+*		Fabian
+*/
 #ifndef IMAGEPLANEVIEW_H
 #define IMAGEPLANEVIEW_H
 #include "vtkSmartPointer.h"
@@ -13,22 +22,13 @@ class ImagePlaneView : public View
 public:
     ImagePlaneView(vtkSmartPointer<vtkAlgorithmOutput> alg, int dim[3]);
     ~ImagePlaneView();
-    /*
-    vtkSmartPointer<vtkRenderWindowInteractor> GetRenderWindowInteractor();
-    vtkSmartPointer<vtkAlgorithmOutput> GetAlgorithmOutput();
-    vtkSmartPointer<vtkRenderer> GetRenderer();
-    */
 
 protected:
     vtkSmartPointer<vtkImagePlaneWidget> iplane[3];
     const int length = 3;
     void activate(vtkSmartPointer<vtkRenderer> renderer, vtkSmartPointer<vtkRenderWindowInteractor> rendint);
 	void deactivate(vtkSmartPointer<vtkRenderer> renderer);
-	/*
-    vtkSmartPointer<vtkRenderWindowInteractor> rwi;
-    vtkSmartPointer<vtkAlgorithmOutput> ao;
-    vtkSmartPointer<vtkRenderer> renderer;
-    */
+
 
 };
 
