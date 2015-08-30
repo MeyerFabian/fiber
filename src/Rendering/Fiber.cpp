@@ -8,6 +8,7 @@ Fiber::Fiber(vtkSmartPointer<vtkRenderer> renderer){
 Fiber::~Fiber(){
 }
 
+// Adds all the Fiberlines to the renderer as actors
 void Fiber::activate(){
 	for (std::vector<vtkSmartPointer<vtkActor> >::size_type t = 0; t < actors.size(); t++){
 		renderer->AddViewProp(actors.at(t));
@@ -16,14 +17,17 @@ void Fiber::activate(){
 
 	cout << "FiberLines Activate called" << endl;
 }
+
+// Generates the actual Fiberlines, which are PolyLines. Method can be optimized a lot probably.
 void Fiber::update(std::vector<vtkSmartPointer<vtkPoints> >* fiberlines){
-
-	deactivate();
-	actors.clear();
 	cout << "FiberLines Update called" << endl;
+
+	//Deactivate all Lines that are currently displayed,
+	deactivate();
+	//so we can clear the vector and start over.
+	actors.clear();
+
 	size_t numberOfPoints=0;
-
-
 	for (std::vector<vtkSmartPointer<vtkPoints> >::size_type t = 0; t < fiberlines->size(); t++){
 
 		// Create a cell array to store the line in and add the line to it
@@ -57,9 +61,13 @@ void Fiber::update(std::vector<vtkSmartPointer<vtkPoints> >* fiberlines){
 		actors.push_back(actor1);
 
 	}
+
+	//Render the lines
 	activate();
 	
 }
+
+//Removes all actors(lines) from the Renderer
 void Fiber::deactivate(){
 	for (std::vector<vtkSmartPointer<vtkActor> >::size_type t = 0; t < actors.size(); t++){
 		renderer->RemoveViewProp(actors.at(t));
