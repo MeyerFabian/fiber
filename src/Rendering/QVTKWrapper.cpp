@@ -33,6 +33,10 @@ vtkSmartPointer<vtkInteractorStyle> QVTKWrapper::GetInteractorStyle(){
     return this->istyle;
 }
 
+void QVTKWrapper::SetImageReader(vtkSmartPointer<vtkImageReader2> imgreader){
+	this->reader = imgreader;
+}
+
 QVTKWidget* QVTKWrapper::GetQVTKWidget(){
     return this->qvtkwidget;
 }
@@ -91,7 +95,7 @@ void QVTKWrapper::addSelectionBox(){
 	}
 	delete sb;
 	sb = new SelectionBox();
-	ft = new FiberTracker();
+	ft = new FiberTracker(this->reader);
 	conn->addFiberTracker(this);
 	sb->activate(this->renderer, this->iren);
 }

@@ -71,10 +71,6 @@ PURPOSE.  See the above copyright notice for more information.
 #define NIFTI_FILETYPE 3
 
 
-vtkVector3d addVec(vtkVector3d vec1, vtkVector3d vec2);
-vtkVector3d substractVec(vtkVector3d vec1, vtkVector3d vec2);
-vtkVector3d multiplyVec(vtkVector3d vec1, double scalar);
-
 class Connector;
 class QVTKWrapper;
 class WindowHandler :public QObject

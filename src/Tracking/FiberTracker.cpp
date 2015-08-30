@@ -4,8 +4,9 @@
 // FIBERTRACKING MAINPART ////////////////
 //////////////////////////////////////////
 
-FiberTracker::FiberTracker()
+FiberTracker::FiberTracker(vtkSmartPointer<vtkImageReader2> imgreader)
 {
+	this->reader = imgreader;
 }
 
 
@@ -13,6 +14,9 @@ FiberTracker::~FiberTracker()
 {
 }
 
+vtkVector3d addVec(vtkVector3d vec1, vtkVector3d vec2);
+vtkVector3d substractVec(vtkVector3d vec1, vtkVector3d vec2);
+vtkVector3d multiplyVec(vtkVector3d vec1, double scalar);
 
 void FiberTracker::Init(){}
 
@@ -29,42 +33,50 @@ void FiberTracker::Init(){}
 */
 
 void FiberTracker::Update(vtkVector3d boxWidgetPos, vtkVector3d boxWidgetExtents, int seedPointsPerAxis){
-	cout << "FiberTracking Update called"<<endl;
-	cout << "Position: (" << boxWidgetPos.GetX() << "," << boxWidgetPos.GetY() << "," << boxWidgetPos.GetZ() << ")" << endl;
-	cout << "Size: (" << boxWidgetExtents.GetX() << "," << boxWidgetExtents.GetY() << "," << boxWidgetExtents.GetZ() << ")" << endl;
-	/*
-	tensorComp = new TensorComputations();
-
+	//cout << "FiberTracking Update called"<<endl;
+	//cout << "Position: (" << boxWidgetPos.GetX() << "," << boxWidgetPos.GetY() << "," << boxWidgetPos.GetZ() << ")" << endl;
+	//cout << "Size: (" << boxWidgetExtents.GetX() << "," << boxWidgetExtents.GetY() << "," << boxWidgetExtents.GetZ() << ")" << endl;
+	
+	TensorComputations* tensorComp = new TensorComputations();
+	vtkImageData* input = this->reader->GetOutput();
+	
 	// -------------- Global/GUI Parameters/variables
 	double stepSize = 1;
 	double f = 0;
 	double g = 0;
 	vtkVector3d one;
 	one.Set(1, 1, 1);
-	vtkVector3d startPoint;
-	startPoint.Set(0, 0, 0);																	//in structured coordinates for point ID
 
 	vtkVector3d currentPos;
 	vtkVector3d currentDir;																	//= next step direction = incoming direction = V_n-1
 
 	// ------------- Initialize
 
-	currentPos.Set(startPoint.GetX(), startPoint.GetY(), startPoint.GetZ());
+	currentPos.Set(boxWidgetPos.GetX(), boxWidgetPos.GetY(), boxWidgetPos.GetZ());
 	double ijk[3];
-	ijk[0] = startPoint.GetX();
-	ijk[1] = startPoint.GetY();
-	ijk[2] = startPoint.GetZ();
+	ijk[0] = boxWidgetPos.GetX();
+	ijk[1] = boxWidgetPos.GetY();
+	ijk[2] = boxWidgetPos.GetZ();
 	//vtkIdType pointID = input->ComputeCellId(ijk);											//oder input->FindCell(FindCell(currentPos); ??
 	//vtkIdType pointID = input->FindPoint(ijk);
-	//vtkIdType pointID = input->FindCell(ijk,);
-	int abc[3];
-	abc[0] = 1;
-	abc[1] = 1;
-	abc[2] = 1;
-	vtkIdType pointID = input->ComputeCellId(abc);
+	int subID;
+	double weights[8];
+	double pcoords[3];
+	//vtkIdType pointID = input->FindCell(ijk,NULL,0,0.5,subID,pcoords,weights);
+	//vtkIdType pointID = input->ComputeCellId(abc);
+
+	vtkSmartPointer<vtkPointLocator> pointLocator = vtkSmartPointer<vtkPointLocator>::New();
+	pointLocator->SetDataSet(reader->GetOutput());
+	pointLocator->BuildLocator();
+	vtkIdType pointID = pointLocator->FindClosestPoint(ijk);
 
 	vtkSmartPointer<vtkMatrix3x3> tensors = tensorComp->GetTensorsFromNIFTI(reader, pointID);
 	vtkSmartPointer<vtkMatrix3x3> eigenvectorMatrix = tensorComp->GetEigenvectorsFromTensor(tensors);
+
+	cout << "ID: " << pointID << endl;
+	cout << "Current 1. Tensor: " << tensors->GetElement(0, 0) << " | " << tensors->GetElement(0, 1) << " | " << tensors->GetElement(0, 2) << endl;
+	cout << "Current 1. Eigenvec: " << eigenvectorMatrix->GetElement(0, 0) << " | " << eigenvectorMatrix->GetElement(0, 1) << " | " << eigenvectorMatrix->GetElement(0, 2) << endl;
+	cout << "--------------------------" << endl;
 
 	vtkVector3d eigenvectors[3];
 	eigenvectors[0].Set(eigenvectorMatrix->GetElement(0, 0), eigenvectorMatrix->GetElement(0, 1), eigenvectorMatrix->GetElement(0, 2));	//Reihenfolge?!
@@ -85,7 +97,9 @@ void FiberTracker::Update(vtkVector3d boxWidgetPos, vtkVector3d boxWidgetExtents
 	// -----------------
 
 	int counter = 0;	//TEMP
-	vtkSmartPointer<vtkPointLocator> pointLocator = vtkSmartPointer<vtkPointLocator>::New();
+	//vtkSmartPointer<vtkPointLocator> pointLocator = vtkSmartPointer<vtkPointLocator>::New();
+	//pointLocator->SetDataSet(reader->GetOutput());
+	//pointLocator->BuildLocator();
 
 	while (counter < 50){		//#ToDo: Abbruchbed. einsetzen
 
@@ -95,7 +109,7 @@ void FiberTracker::Update(vtkVector3d boxWidgetPos, vtkVector3d boxWidgetExtents
 		curPos[2] = currentPos.GetZ();
 		pointID = pointLocator->FindClosestPoint(curPos);
 
-		cout << "Current Pos: " << curPos[0] << " | " << curPos[1] << " | " << curPos[2] << endl;
+		//cout << "Current Pos: " << curPos[0] << " | " << curPos[1] << " | " << curPos[2] << endl;
 		//Perform step
 		currentPos = addVec(currentPos, multiplyVec(currentDir.Normalized(), stepSize));
 
@@ -143,7 +157,25 @@ void FiberTracker::Update(vtkVector3d boxWidgetPos, vtkVector3d boxWidgetExtents
 		counter++;
 		//delete ...;
 	}
-	*/
+}
+
+//Custom Vector classes
+vtkVector3d addVec(vtkVector3d vec1, vtkVector3d vec2){
+	vtkVector3d returnVec;
+	returnVec.Set(vec1.GetX() + vec2.GetX(), vec1.GetY() + vec2.GetY(), vec1.GetZ() + vec2.GetZ());
+	return returnVec;
+}
+
+vtkVector3d substractVec(vtkVector3d vec1, vtkVector3d vec2){
+	vtkVector3d returnVec;
+	returnVec.Set(vec1.GetX() - vec2.GetX(), vec1.GetY() - vec2.GetY(), vec1.GetZ() - vec2.GetZ());
+	return returnVec;
+}
+
+vtkVector3d multiplyVec(vtkVector3d vec1, double scalar){
+	vtkVector3d returnVec;
+	returnVec.Set(vec1.GetX() *scalar, vec1.GetY() *scalar, vec1.GetZ() *scalar);
+	return returnVec;
 }
 
 

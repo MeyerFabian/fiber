@@ -24,6 +24,7 @@ public:
     vtkSmartPointer<vtkRenderWindow> GetRenderWindow();
     vtkSmartPointer<vtkRenderWindowInteractor> GetInteractor();
 	vtkSmartPointer<vtkInteractorStyle> GetInteractorStyle();
+	void SetImageReader(vtkSmartPointer<vtkImageReader2> imgreader);
 	SelectionBox* GetSelectionBox();
     QVTKWidget* GetQVTKWidget();
     void render();
@@ -42,6 +43,7 @@ protected:
     vtkSmartPointer<vtkRenderWindow> renWin;
     vtkSmartPointer<vtkRenderWindowInteractor> iren;
     vtkSmartPointer<vtkInteractorStyle> istyle;
+	vtkSmartPointer<vtkImageReader2> reader;
     QVTKWidget* qvtkwidget;
     View* view = NULL;
 	ViewMode activeView = IMAGEPLANE;
