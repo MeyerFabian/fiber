@@ -14,13 +14,13 @@ void Fiber::activate(){
 
 	}
 
-	cout << "FiberLines Activate called" << endl;
+	//cout << "FiberLines Activate called" << endl;
 }
 void Fiber::update(std::vector<vtkSmartPointer<vtkPoints> >* fiberlines){
 
 	deactivate();
 	actors.clear();
-	cout << "FiberLines Update called" << endl;
+	//cout << "FiberLines Update called" << endl;
 	size_t numberOfPoints=0;
 
 

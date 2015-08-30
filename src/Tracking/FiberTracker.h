@@ -16,19 +16,22 @@ public:
 	~FiberTracker();
 	void Init();
 	void Update(vtkVector3d boxWidgetPos, vtkVector3d boxWidgetExtents, int seedPointsPerAxis);
-<<<<<<< HEAD
 protected:
 	vtkSmartPointer<vtkImageReader2> reader;
 private:
 	double stepSize;
 	double f;
 	double g;
-=======
 signals:
 	void updateFibers(std::vector<vtkSmartPointer<vtkPoints> >* fiberlines);
 private:
 	std::vector<vtkSmartPointer<vtkPoints> >* fiberlines;
->>>>>>> 3a1a47ad5c59b1f47a88fc09c527738885eaef38
+	vtkSmartPointer<vtkPointLocator> pointLocator;
+	TensorComputations* tensorComp;
+	vtkVector3d currentPos;
+	vtkVector3d currentDir;	//= next step direction = incoming direction = V_n-1
+	vtkVector3d v_n;
+	vtkVector3d v_nPlus1;
 };
 
 #endif

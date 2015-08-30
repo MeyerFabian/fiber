@@ -16,15 +16,16 @@ vtkSmartPointer<vtkMatrix3x3> TensorComputations::GetTensorsFromNIFTI(vtkSmartPo
 	niftiReader->Update();
 
 	//#Valle: Read out tensor data
-	vtkSmartPointer<vtkDataArray> tensors = niftiReader->GetOutput()->GetPointData()->GetScalars();
+	vtkDataArray *tensors = niftiReader->GetOutput()->GetPointData()->GetScalars();
 	vtkSmartPointer<vtkMatrix3x3 > tensorMatrix = vtkSmartPointer<vtkMatrix3x3>::New();
-	double tensor[9];
+	double tensor[9] {0,0,0,0,0,0,0,0,0};
 	tensors->GetTuple(pointID, tensor);
 
 	int x, y = 0;
 
 	for (int i = 0; i < 9; i++)
 	{
+		cout << tensor[i] << endl;
 		if (i % 3 == 0){
 			x = 0;
 			y++;
