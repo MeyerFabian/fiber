@@ -1,3 +1,10 @@
+/*	BoxView.h
+*
+*		Adds a BoxWidget which holds a volume in it. The Widget can be used to easily 
+*		clip the volume to allow better visibility when unnecessary information are clipped out.
+*	
+*	Fabian
+*/
 #ifndef BOXVIEW_H
 #define BOXVIEW_H
 #include "vtkSmartPointer.h"

@@ -1,3 +1,13 @@
+/*	QVTKWrapper.h
+*
+*		QVTKWrapper is the Connection from the QTGui to the VTKRenderWindow.
+*		It uses several Methods that are called back by the GUI to render
+*		various properties, actors, widgets and even initialize the
+*		FiberTracking, when said so by the GUI.
+*	
+*	Fabian
+*/
+
 #ifndef QVTKWRAPPER_H
 #define QVTKWRAPPER_H
 #include "vtkSmartPointer.h"
@@ -14,6 +24,7 @@
 #include "../GUI/Connector.h"
 #include "Fiber.h"
 class Connector;
+
 enum ViewMode{IMAGEPLANE,BOX};
 class QVTKWrapper : public QObject
 {
