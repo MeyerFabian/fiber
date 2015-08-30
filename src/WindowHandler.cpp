@@ -83,12 +83,9 @@ void WindowHandler::init(vtkSmartPointer<vtkImageReader2> reader){
 	vtkSmartPointer<vtkImageData> input = 0;
 	input = reader->GetOutput();
 
-<<<<<<< HEAD
 	// Passing through the image data to the FiberTracker class
 	window1->SetImageReader(reader);
 
-=======
->>>>>>> e649772f5e3f7010a1589d998b14cb4f485d71f3
 	int dim[3];
 	input->GetDimensions(dim);
 
