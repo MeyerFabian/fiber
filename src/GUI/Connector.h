@@ -8,7 +8,7 @@
 #include <vector>
 #include "../Rendering/QVTKWrapper.h"
 #include "../WindowHandler.h"
-#include "vtkVector.h"
+#include "vtkPoints.h"
 #include "../Tracking/FiberTracker.h"
 #include "../Rendering/SelectionBox.h"
 class WindowHandler;
@@ -22,8 +22,9 @@ public:
 	bool addBoxView(QVTKWrapper* qvtk);
 	bool addImagePlaneView(QVTKWrapper* qvtk);
 	bool addWindowHandler(ImageReaderWrapper* iw, WindowHandler* wh);
-	bool addSelectionBox(QVTKWrapper* qvtk);
+	bool addMainAlgorithm(QVTKWrapper* qvtk);
 	bool addFiberTracker(QVTKWrapper* qvtk);
+	bool addFiberLines(QVTKWrapper* qvtk);
 private:
 	QMainWindow* window;
 	Ui::MainWindow* uimw;

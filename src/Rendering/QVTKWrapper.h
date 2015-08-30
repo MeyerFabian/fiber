@@ -12,6 +12,7 @@
 #include "SelectionBox.h"
 #include "../Tracking/Fibertracker.h"
 #include "../GUI/Connector.h"
+#include "Fiber.h"
 class Connector;
 enum ViewMode{IMAGEPLANE,BOX};
 class QVTKWrapper : public QObject
@@ -26,6 +27,8 @@ public:
 	vtkSmartPointer<vtkInteractorStyle> GetInteractorStyle();
 	void SetImageReader(vtkSmartPointer<vtkImageReader2> imgreader);
 	SelectionBox* GetSelectionBox();
+	FiberTracker* GetFiberTracker(); 
+	Fiber* GetFiber();
     QVTKWidget* GetQVTKWidget();
     void render();
     View* getView();
@@ -35,7 +38,7 @@ public:
 public slots:
 	void switchToBoxView();
 	void switchToImagePlaneView(); 
-	void addSelectionBox();
+	void addMainAlgorithm();
 	void Update(vtkVector3d, vtkVector3d, int);
 
 protected:
@@ -49,6 +52,7 @@ protected:
 	ViewMode activeView = IMAGEPLANE;
 	ViewCreator* vc=NULL;
 	FiberTracker* ft = NULL;
+	Fiber *fl = NULL;
 	SelectionBox* sb = NULL;
 	Connector* conn = NULL;
 };

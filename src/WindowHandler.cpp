@@ -143,7 +143,7 @@ void WindowHandler::init(vtkSmartPointer<vtkImageReader2> reader){
 
 	conn->addBoxView(window1);
 	conn->addImagePlaneView(window1);
-	conn->addSelectionBox(window1);
+	conn->addMainAlgorithm(window1);
 	window1->deactivateView();
 
 

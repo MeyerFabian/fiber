@@ -6,12 +6,18 @@
 
 FiberTracker::FiberTracker(vtkSmartPointer<vtkImageReader2> imgreader)
 {
+<<<<<<< HEAD
 	this->reader = imgreader;
+=======
+	fiberlines = new std::vector<vtkSmartPointer<vtkPoints> >();
+>>>>>>> 3a1a47ad5c59b1f47a88fc09c527738885eaef38
 }
 
 
 FiberTracker::~FiberTracker()
 {
+	fiberlines->clear();
+	delete fiberlines;
 }
 
 vtkVector3d addVec(vtkVector3d vec1, vtkVector3d vec2);
@@ -33,6 +39,7 @@ void FiberTracker::Init(){}
 */
 
 void FiberTracker::Update(vtkVector3d boxWidgetPos, vtkVector3d boxWidgetExtents, int seedPointsPerAxis){
+<<<<<<< HEAD
 	//cout << "FiberTracking Update called"<<endl;
 	//cout << "Position: (" << boxWidgetPos.GetX() << "," << boxWidgetPos.GetY() << "," << boxWidgetPos.GetZ() << ")" << endl;
 	//cout << "Size: (" << boxWidgetExtents.GetX() << "," << boxWidgetExtents.GetY() << "," << boxWidgetExtents.GetZ() << ")" << endl;
@@ -40,6 +47,57 @@ void FiberTracker::Update(vtkVector3d boxWidgetPos, vtkVector3d boxWidgetExtents
 	TensorComputations* tensorComp = new TensorComputations();
 	vtkImageData* input = this->reader->GetOutput();
 	
+=======
+	cout << "FiberTracking Update called"<<endl;
+	cout << "Position: (" << boxWidgetPos.GetX() << "," << boxWidgetPos.GetY() << "," << boxWidgetPos.GetZ() << ")" << endl;
+	cout << "Size: (" << boxWidgetExtents.GetX() << "," << boxWidgetExtents.GetY() << "," << boxWidgetExtents.GetZ() << ")" << endl;
+	/*
+	for (std::vector<vtkSmartPointer<vtkPoints> >::size_type t = 0; t < fiberlines->size(); t++){
+		fiberlines->at(t)->Delete();
+	}
+	*/
+	fiberlines->clear();
+	
+	//Line 1
+	fiberlines->push_back(vtkSmartPointer<vtkPoints>::New());
+		//Point 1
+	double p00[3] = { boxWidgetPos.GetX(), boxWidgetPos.GetY(), boxWidgetPos.GetZ() };
+		fiberlines->at(0)->InsertNextPoint(p00);
+		//Point 2
+		double p01[3] = { 5.0, 0.0, 0.0 };
+		fiberlines->at(0)->InsertNextPoint(p01);
+		//Point 3
+		double p02[3] = { 5.0, 10.0, 0.0 };
+		fiberlines->at(0)->InsertNextPoint(p02);
+		//Point 4
+		double p03[3] = { 6.0, 50.0, 0.0 };
+		fiberlines->at(0)->InsertNextPoint(p03);
+		//Point 5
+		double p04[3] = { 7.0, 70.0, 0.0 };
+		fiberlines->at(0)->InsertNextPoint(p04);
+		
+	//Line 2
+	fiberlines->push_back(vtkSmartPointer<vtkPoints>::New());
+		//Point 1
+	double p10[3] = { boxWidgetPos.GetX(), boxWidgetPos.GetY(), boxWidgetPos.GetZ() };
+		fiberlines->at(1)->InsertNextPoint(p00);
+		//Point 2
+		double p11[3] = { 50.0, 0.0, 0.0 };
+		fiberlines->at(1)->InsertNextPoint(p11);
+		//Point 3
+		double p12[3] = { 50.0, 20.0, 0.0 };
+		fiberlines->at(1)->InsertNextPoint(p12);
+		//Point 4
+		double p13[3] = { 70.0, 20.0, 0.0 };
+		fiberlines->at(1)->InsertNextPoint(p13);
+		//Point 5
+		double p14[3] = { 80.0, 0.0, 0.0 };
+		fiberlines->at(1)->InsertNextPoint(p14);
+		
+	/*
+	tensorComp = new TensorComputations();
+
+>>>>>>> 3a1a47ad5c59b1f47a88fc09c527738885eaef38
 	// -------------- Global/GUI Parameters/variables
 	double stepSize = 1;
 	double f = 0;
@@ -157,6 +215,7 @@ void FiberTracker::Update(vtkVector3d boxWidgetPos, vtkVector3d boxWidgetExtents
 		counter++;
 		//delete ...;
 	}
+<<<<<<< HEAD
 }
 
 //Custom Vector classes
@@ -176,6 +235,10 @@ vtkVector3d multiplyVec(vtkVector3d vec1, double scalar){
 	vtkVector3d returnVec;
 	returnVec.Set(vec1.GetX() *scalar, vec1.GetY() *scalar, vec1.GetZ() *scalar);
 	return returnVec;
+=======
+	*/
+	emit updateFibers(fiberlines);
+>>>>>>> 3a1a47ad5c59b1f47a88fc09c527738885eaef38
 }
 
 

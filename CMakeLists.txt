@@ -36,6 +36,8 @@ src/Rendering/ViewCreator.h
 src/Rendering/ViewCreator.cpp
 src/Rendering/SelectionBox.h
 src/Rendering/SelectionBox.cpp
+src/Rendering/Fiber.h
+src/Rendering/Fiber.cpp
 src/GUI/ui_mainwindow.h
 src/GUI/FileMenu.h
 src/GUI/FileMenu.cpp
