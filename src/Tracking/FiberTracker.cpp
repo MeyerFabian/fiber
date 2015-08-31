@@ -49,6 +49,7 @@ void FiberTracker::Update(vtkVector3d boxWidgetPos, vtkVector3d boxWidgetExtents
 
 	vtkVector3d one;
 	one.Set(1, 1, 1);
+	bool prntInfo = false;
 
 	// ------------- Initialize
 
@@ -59,18 +60,19 @@ void FiberTracker::Update(vtkVector3d boxWidgetPos, vtkVector3d boxWidgetExtents
 	curPos[1] = currentPos.GetY();
 	curPos[2] = currentPos.GetZ();
 
-	this->reader->Update(); //??
-	//fiberlines->push_back(vtkSmartPointer<vtkPoints>::New());
+	//this->reader->Update(); //??
 
 	vtkIdType pointID = pointLocator->FindClosestPoint(curPos);//pointer?
 
 	vtkSmartPointer<vtkMatrix3x3> tensors = tensorComp->GetTensorsFromNIFTI(this->reader, pointID);//normaler statt Smartpointer??//global definieren??
 	vtkSmartPointer<vtkMatrix3x3> eigenvectorMatrix = tensorComp->GetEigenvectorsFromTensor(tensors);
 
-	cout << "Starting ID: " << pointID << endl;
-	cout << "Current 1. Tensor: " << tensors->GetElement(1, 0) << " | " << tensors->GetElement(1, 1) << " | " << tensors->GetElement(1, 2) << endl;
-	cout << "Current 1. Eigenvec: " << eigenvectorMatrix->GetElement(0, 0) << " | " << eigenvectorMatrix->GetElement(0, 1) << " | " << eigenvectorMatrix->GetElement(0, 2) << endl;
-	cout << "=========================" << endl;
+	if (prntInfo){
+		cout << "Starting ID: " << pointID << endl;
+		cout << "Current 1. Tensor: " << tensors->GetElement(1, 0) << " | " << tensors->GetElement(1, 1) << " | " << tensors->GetElement(1, 2) << endl;
+		cout << "Current 1. Eigenvec: " << eigenvectorMatrix->GetElement(0, 0) << " | " << eigenvectorMatrix->GetElement(0, 1) << " | " << eigenvectorMatrix->GetElement(0, 2) << endl;
+		cout << "=========================" << endl;
+	}
 
 	vtkVector3d eigenvectors[3];
 	eigenvectors[0].Set(eigenvectorMatrix->GetElement(0, 0), eigenvectorMatrix->GetElement(0, 1), eigenvectorMatrix->GetElement(0, 2));	//Reihenfolge?!
@@ -90,12 +92,17 @@ void FiberTracker::Update(vtkVector3d boxWidgetPos, vtkVector3d boxWidgetExtents
 
 	// -----------------
 
-	int invalidStepsTaken = 0;	//TEMP
+	int invalidStepsTaken = 0;
 
-	while (invalidStepsTaken < 10){		//#ToDo: Abbruchbed. einsetzen
+	//create new fiberline
+	fiberlines->clear();
+	fiberlines->push_back(vtkSmartPointer<vtkPoints>::New());
+	fiberlines->at(0)->InsertNextPoint(curPos);
+
+
+	while (invalidStepsTaken < 70){		//#ToDo: Abbruchbed. verbessern
 
 		pointID = pointLocator->FindClosestPoint(curPos);
-		fiberlines->clear();
 
 		//Perform step
 		currentPos = addVec(currentPos, multiplyVec(currentDir.Normalized(), this->stepSize));
@@ -113,11 +120,17 @@ void FiberTracker::Update(vtkVector3d boxWidgetPos, vtkVector3d boxWidgetExtents
 			tensors = tensorComp->GetTensorsFromNIFTI(this->reader, newPointID);
 			eigenvectorMatrix = tensorComp->GetEigenvectorsFromTensor(tensors);
 
-			cout << "Current Pos: " << curPos[0] << " | " << curPos[1] << " | " << curPos[2] << endl;
-			cout << "new PointID: " << newPointID << endl;
-			cout << "Current 2. Tensor: " << tensors->GetElement(1, 0) << " | " << tensors->GetElement(1, 1) << " | " << tensors->GetElement(1, 2) << endl;
-			cout << "Current 2. Eigenvec: " << eigenvectorMatrix->GetElement(0, 0) << " | " << eigenvectorMatrix->GetElement(0, 1) << " | " << eigenvectorMatrix->GetElement(0, 2) << endl;
-			cout << "--------------------------" << endl;
+			if (prntInfo){
+				cout << "Current Pos: " << curPos[0] << " | " << curPos[1] << " | " << curPos[2] << endl;
+				cout << "new PointID: " << newPointID << endl;
+				cout << "Current 2. Tensor: " << tensors->GetElement(1, 0) << " | " << tensors->GetElement(1, 1) << " | " << tensors->GetElement(1, 2) << endl;
+				cout << "Current 2. Eigenvec: " << eigenvectorMatrix->GetElement(0, 0) << " | " << eigenvectorMatrix->GetElement(0, 1) << " | " << eigenvectorMatrix->GetElement(0, 2) << endl;
+				cout << "--------------------------" << endl;
+			}
+
+			eigenvectors[0].Set(eigenvectorMatrix->GetElement(0, 0), eigenvectorMatrix->GetElement(0, 1), eigenvectorMatrix->GetElement(0, 2));	//Reihenfolge?!
+			eigenvectors[1].Set(eigenvectorMatrix->GetElement(1, 0), eigenvectorMatrix->GetElement(1, 1), eigenvectorMatrix->GetElement(1, 2));
+			eigenvectors[2].Set(eigenvectorMatrix->GetElement(2, 0), eigenvectorMatrix->GetElement(2, 1), eigenvectorMatrix->GetElement(2, 2));
 
 			float angles[3];
 			angles[0] = eigenvectors[0].Dot(currentDir);
@@ -137,15 +150,16 @@ void FiberTracker::Update(vtkVector3d boxWidgetPos, vtkVector3d boxWidgetExtents
 			currentDir = v_nPlus1;
 
 			// Add point to renderer
-			fiberlines->push_back(vtkSmartPointer<vtkPoints>::New());
 			fiberlines->at(0)->InsertNextPoint(curPos);
-			emit updateFibers(fiberlines);
+
 		}
 
 		else{
 
-			//Perform step
-			cout << "did not enter new Voxel" << endl;
+			if (prntInfo)
+				cout << "did not enter new Voxel" << endl;
+
+			//Perform further step
 			currentPos = addVec(currentPos, multiplyVec(currentDir.Normalized(), this->stepSize));
 
 			invalidStepsTaken++;
@@ -153,6 +167,8 @@ void FiberTracker::Update(vtkVector3d boxWidgetPos, vtkVector3d boxWidgetExtents
 		
 		//delete ...?;
 	}
+	emit updateFibers(fiberlines);
+	
 }
 
 //Custom Vector classes

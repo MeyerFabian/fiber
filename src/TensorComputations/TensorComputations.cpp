@@ -25,7 +25,7 @@ vtkSmartPointer<vtkMatrix3x3> TensorComputations::GetTensorsFromNIFTI(vtkSmartPo
 
 	for (int i = 0; i < 9; i++)
 	{
-		cout << tensor[i] << endl;
+		//cout << tensor[i] << endl;
 		if (i % 3 == 0){
 			x = 0;
 			y++;
