@@ -71,7 +71,7 @@ void SelectionBox::activate(vtkSmartPointer<vtkRenderer> renderer, vtkSmartPoint
 	update();
 }
 void SelectionBox::update(){
-	cout << "SelectionBoxUpdate called" << endl;
+	//cout << "SelectionBoxUpdate called" << endl;
 
 	//Convert the Widget to Polydata, so we can read out its position and size.
 	vtkSmartPointer<vtkPolyData> points= vtkSmartPointer<vtkPolyData>::New();
@@ -90,7 +90,7 @@ void SelectionBox::update(){
 	boxWidgetExtents.SetY(*(bounds+3)-*(bounds + 2));
 	boxWidgetExtents.SetZ(*(bounds+5)-*(bounds + 4));
 
-	int seedPointsperAxis = 10;
+	int seedPointsperAxis = 2;
 	//Signal the FiberTracker that our SelectionBox was updated.
 	emit SelectionBoxChanged(boxWidgetPos, boxWidgetExtents, seedPointsperAxis);
 		

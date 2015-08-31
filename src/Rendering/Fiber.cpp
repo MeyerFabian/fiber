@@ -15,12 +15,12 @@ void Fiber::activate(){
 
 	}
 
-	cout << "FiberLines Activate called" << endl;
+	//cout << "FiberLines Activate called" << endl;
 }
 
 // Generates the actual Fiberlines, which are PolyLines. Method can be optimized a lot probably.
 void Fiber::update(std::vector<vtkSmartPointer<vtkPoints> >* fiberlines){
-	cout << "FiberLines Update called" << endl;
+	//cout << "FiberLines Update called" << endl;
 
 	//Deactivate all Lines that are currently displayed,
 	deactivate();

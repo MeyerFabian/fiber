@@ -16,12 +16,13 @@ public:
 	~FiberTracker();
 	void Init();
 	void Update(vtkVector3d boxWidgetPos, vtkVector3d boxWidgetExtents, int seedPointsPerAxis);
+	double g;
+	double stepSize;
 protected:
 	vtkSmartPointer<vtkImageReader2> reader;
 private:
-	double stepSize;
 	double f;
-	double g;
+	void TrackFiber(vtkVector3d startPoint, int fiberLineNr);
 signals:
 	void updateFibers(std::vector<vtkSmartPointer<vtkPoints> >* fiberlines);
 private:

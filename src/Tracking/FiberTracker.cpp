@@ -46,14 +46,39 @@ void FiberTracker::Update(vtkVector3d boxWidgetPos, vtkVector3d boxWidgetExtents
 	//cout << "FiberTracking Update called"<<endl;
 	//cout << "Position: (" << boxWidgetPos.GetX() << "," << boxWidgetPos.GetY() << "," << boxWidgetPos.GetZ() << ")" << endl;
 	//cout << "Size: (" << boxWidgetExtents.GetX() << "," << boxWidgetExtents.GetY() << "," << boxWidgetExtents.GetZ() << ")" << endl;
+	
+	fiberlines->clear();
+	vtkVector3d startPoint;
 
+	double x, y, z;
+	int fiberLineCounter = 0;
+
+	for (int i = 0; i < seedPointsPerAxis; i++){
+		for (int j = 0; j < seedPointsPerAxis; j++){
+			for (int k = 0; k < seedPointsPerAxis; k++){
+				
+				x = boxWidgetPos.GetX() + (double)i / (double)seedPointsPerAxis * boxWidgetExtents.GetX();
+				y = boxWidgetPos.GetY() + (double)j / (double)seedPointsPerAxis * boxWidgetExtents.GetY();
+				z = boxWidgetPos.GetZ() + (double)k / (double)seedPointsPerAxis * boxWidgetExtents.GetZ();
+				startPoint.Set(x, y, z);
+
+				TrackFiber(startPoint, fiberLineCounter);
+				fiberLineCounter++;
+			}
+		}
+	}
+	
+	
+}
+
+void FiberTracker::TrackFiber(vtkVector3d startPoint, int fiberLineNr){
 	vtkVector3d one;
 	one.Set(1, 1, 1);
 	bool prntInfo = false;
 
 	// ------------- Initialize
 
-	currentPos.Set(boxWidgetPos.GetX(), boxWidgetPos.GetY(), boxWidgetPos.GetZ());
+	currentPos.Set(startPoint.GetX(), startPoint.GetY(), startPoint.GetZ());
 
 	double curPos[3];
 	curPos[0] = currentPos.GetX();
@@ -95,9 +120,8 @@ void FiberTracker::Update(vtkVector3d boxWidgetPos, vtkVector3d boxWidgetExtents
 	int invalidStepsTaken = 0;
 
 	//create new fiberline
-	fiberlines->clear();
 	fiberlines->push_back(vtkSmartPointer<vtkPoints>::New());
-	fiberlines->at(0)->InsertNextPoint(curPos);
+	fiberlines->at(fiberLineNr)->InsertNextPoint(curPos);
 
 
 	while (invalidStepsTaken < 70){		//#ToDo: Abbruchbed. verbessern
@@ -150,7 +174,7 @@ void FiberTracker::Update(vtkVector3d boxWidgetPos, vtkVector3d boxWidgetExtents
 			currentDir = v_nPlus1;
 
 			// Add point to renderer
-			fiberlines->at(0)->InsertNextPoint(curPos);
+			fiberlines->at(fiberLineNr)->InsertNextPoint(curPos);
 
 		}
 
@@ -164,12 +188,12 @@ void FiberTracker::Update(vtkVector3d boxWidgetPos, vtkVector3d boxWidgetExtents
 
 			invalidStepsTaken++;
 		}
-		
+
 		//delete ...?;
 	}
 	emit updateFibers(fiberlines);
-	
 }
+
 
 //Custom Vector classes
 vtkVector3d addVec(vtkVector3d vec1, vtkVector3d vec2){
