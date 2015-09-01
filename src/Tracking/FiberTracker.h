@@ -1,3 +1,17 @@
+/*	FiberTracker.h
+*
+*		The FiberTracker performs the actual tracking of the fibers in the NIFTI dataset.
+*		To do so, the FiberTracker gets the pointer to the dataset from the QVTKWrapper.
+*		Several parameters can be set by the user such as stepSize, seedPointsPerAxis etc.
+*		For the computation of the tracking formula, requests are sent to the TensorComputations class,
+*		which sends back the local tensor and eigenvectors.
+*		The final points of the fiberline are stored in a vtkPoints array so that they can be rendered.
+*		These vtkPoints arrays are stored in a fiberlines array, because more than one fiberline at a time
+*		should be renderable.
+*
+*	Valentin
+*/
+
 #ifndef FIBERTRACKER_H
 #define FIBERTRACKER_H
 #include "vtkVector.h"

@@ -1,3 +1,14 @@
+/*	TensorComputations.h
+*
+*		The TensorComputations class handles the requests of the FiberTracker class.
+*		For a specific dataset and pointID, the local tensor can be transferred.
+*		With a 3x3 tensor, the three eigenvectors of that tensors can be computed
+*		and transferred.
+*
+*	Valentin
+*/
+
+
 #ifndef TENSORCOMPUTATIONS_H
 #define TENSORCOMPUTATIONS_H
 

@@ -49,18 +49,18 @@ vtkSmartPointer<vtkMatrix3x3> TensorComputations::GetEigenvectorsFromTensor(vtkS
 	// an array of all the y values, and an array of all the
 	// z values.
 
-	// Construct a data set of 3 3D points.
+	// Construct a data set of 3 3D points
 
-	// These would be all of your "x" values.
+	// These would be all of your "x" values
 	const char m0Name[] = "M0";
 	vtkSmartPointer<vtkDoubleArray> dataset1Arr = vtkSmartPointer<vtkDoubleArray>::New();
 	dataset1Arr->SetNumberOfComponents(1);
 	dataset1Arr->SetName(m0Name);
-	dataset1Arr->InsertNextValue(tensor->GetElement(0, 0));		//Reihenfolge checken!
+	dataset1Arr->InsertNextValue(tensor->GetElement(0, 0));
 	dataset1Arr->InsertNextValue(tensor->GetElement(0, 1));
 	dataset1Arr->InsertNextValue(tensor->GetElement(0, 2));
 
-	// These would be all of your "y" values.
+	// These would be all of your "y" values
 	const char m1Name[] = "M1";
 	vtkSmartPointer<vtkDoubleArray> dataset2Arr = vtkSmartPointer<vtkDoubleArray>::New();
 	dataset2Arr->SetNumberOfComponents(1);
@@ -69,7 +69,7 @@ vtkSmartPointer<vtkMatrix3x3> TensorComputations::GetEigenvectorsFromTensor(vtkS
 	dataset2Arr->InsertNextValue(tensor->GetElement(1, 1));
 	dataset2Arr->InsertNextValue(tensor->GetElement(1, 2));
 
-	// These would be all of your "z" values.
+	// These would be all of your "z" values
 	const char m2Name[] = "M2";
 	vtkSmartPointer<vtkDoubleArray> dataset3Arr = vtkSmartPointer<vtkDoubleArray>::New();
 	dataset3Arr->SetNumberOfComponents(1);
